@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}Detail du job : {{ object.name }}{% endblock %}
+
+{% block content %}
+
+	<div class="box">
+		<h2>Detail du job : {{ object.name }}</h2>
+
+		<ul>
+		    <li>Description : {{ object.description }}</li>
+		    <li>Created on : {{ object.created_on }}</li>
+		    <li>Modified on : {{ object.modified_on }}</li>
+		    <li>Encoder : {{ object.encoder.name }}</li>
+		    <li>Options : {{ object.options }}</li>
+		    <li>Extension : {{ object.extension }}</li>
+		</ul>
+
+		<a href="{% url job_edit id %}">edit</a>&nbsp;-&nbsp;<a href="{% url job_delete id %}">delete</a>
+	</div>
+
+{% endblock %}

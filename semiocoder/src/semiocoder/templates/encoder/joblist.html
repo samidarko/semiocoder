@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Mes joblists{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript" src="/static/js/jsTree/jquery.jstree.js"></script>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="box">
+	<h2>Mes joblists</h2>
+
+	<div id="joblist_tree"></div>
+
+	<script type="text/javascript">
+	
+	$(function () {
+	
+	
+	    $("#joblist_tree").jstree({ 
+	        "plugins" : [ "themes" , "json_data", "search" , "adv_search" , "types",  "sort" ],
+	        "core" : { 
+	            "animation" : 150,
+	            "html_titles" : true,
+	        },
+	        "themes" : {
+	            "theme" : "classic",
+	            "dots" : false,
+	        },
+	        "search" : {
+	            "case_insensitive" : true,
+	            "ajax" : {
+	                "url" : "/assets/search{% if divisions %}?divisions={{ divisions_str }}{% endif %}"
+	            }
+	        },
+		"types" : {
+	            "max_depth" : -2,
+	            "max_children" : -2,
+	            "valid_children" : [ "joblist" ],
+	            "types" : {
+	                "joblist" : {
+                		"icon" : {
+	                			"image" : '/static/images/joblist.png',
+	                		},
+	                    "class" : "joblist-row",
+	                    "valid_children" : [ "job" ],
+	                    "max_depth" : 4,
+	                    "open_node"   : true,
+	                    "close_node"  : true,
+	                },
+	                "job" : {
+	                	"icon" : {
+                			"image" : '/static/images/job.png',
+                		},
+	                    "valid_children" : [ "job_detail" ],
+	                    "max_depth" : 3,
+	                    "open_node"   : true,
+	                    "close_node"  : true
+	                },
+	                "job_detail" : {
+	                	"icon" : {
+                			"image" : '/static/images/settings.gif',
+                		},
+	                    "valid_children" : "none",
+	                    "max_depth" : 0,
+	                    "select_node" : false,
+	                    "open_node"   : false,
+	                    "close_node"  : false,
+	                    "create_node" : false,
+	                    "delete_node" : false
+	                },
+	            }
+	        },
+	        "json_data" : {
+	            "data" : [
+	                {% for j in joblist_list %}
+	                {
+	                    "data" : { "title" : "<b>{{ j.name }}</b><i> - (created by {{ j.owner }})</i>", "attr" : { "href" : "{% url joblist_detail j.id %}" } },
+	                    "attr" : { "id" : "_{{ j.id }}", "rel" : "joblist", "class" : "joblist-row" },
+	                    "state" : "closed"
+	                },
+	                {% endfor %}
+	            ],
+	            "ajax" : {
+	                "url" : function(node) { 
+	                    var url = "/encoding/joblist/data";
+	                    url += node.attr ? node.attr("id").replace(/_/g, "/") : "";
+	                    return url; 
+	                }
+	            }
+	        }
+	    });
+	});
+	
+	</script>
+</div>
+{% endblock %}
+

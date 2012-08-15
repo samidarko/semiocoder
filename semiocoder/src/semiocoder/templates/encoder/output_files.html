@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Output files{% endblock %}
+
+
+{% block content %}
+
+<div class="box">
+	<h2>Output files</h2>
+	<form action="{% url task_output th.id %}" method="post">
+		{% csrf_token %}
+		<p>
+			<ul> 
+				{% for outputfile in outputfiles %}
+					<li>
+						<label for="id_outputfiles_{{ forloop.counter0 }}">
+						<input type="checkbox" name="outputfiles" value="{{ MEDIA_URL }}videos/{{ th.outputdir }}/{{ outputfile }}" id="id_outputfiles_{{ forloop.counter0 }}" />
+						<a href="{{ MEDIA_URL }}videos/{{ th.outputdir }}/{{ outputfile }}">{{ outputfile }}</a>
+						</label>
+					</li> 
+				{% endfor %}
+			</ul>
+		</p> 
+	<input type="submit" value="Delete" />
+	</form>
+</div>
+{% endblock %}

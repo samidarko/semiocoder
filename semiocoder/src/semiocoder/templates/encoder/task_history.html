@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Tasks history{% endblock %}
+
+{% block stylesheet %} 
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/smoothness/jquery-ui-1.8.22.custom.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/jquery.dataTables_themeroller.css" />
+{% endblock %}
+
+{% block scripts %}
+	<!-- <script type="text/javascript" src="/static/js/lib/jquery-1.6.1.min.js"></script> -->
+	<script type="text/javascript" src="/static/js/dataTables/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#taskhis_table').dataTable( {
+			"bJQueryUI": true,
+	        "sPaginationType": "full_numbers",
+			"bProcessing": true,
+			"bServerSide": true,
+			"sAjaxSource": "{% url task_history_data %}",
+			"aoColumns": [
+			               { "sWidth": "14%" },
+			               { "sWidth": "15%", sClass: "alignCenter", },
+			               { "sWidth": "27%", sClass: "alignCenter", },
+			               { "sWidth": "27%", sClass: "alignCenter", },
+			               { "sWidth": "12%", sClass: "alignCenter", },
+			               { "sWidth": "5%", sClass: "alignCenter", },
+			             ]
+		} );
+	} );
+	</script>
+{% endblock %}
+
+
+
+{% block content %}
+	<div class="box">
+		<h2>Tasks history</h2>
+	
+		<table id="taskhis_table">
+		    <thead>
+			<tr>
+			    <th>joblist</th>
+			    <th>state</th>
+			    <th>starttime</th>
+			    <th>endtime</th>
+			    <th>output</th>
+			    <th>log</th>
+			</tr>
+		    </thead>
+		    <tbody>
+		
+		    </tbody>
+		</table>
+	</div>
+{% endblock %}
+
+
+

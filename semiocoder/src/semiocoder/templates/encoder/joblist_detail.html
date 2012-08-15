@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Mes joblists{% endblock %}
+
+{% block content %}
+
+	<div class="box">
+		<h2>Detail du joblist : {{ object.name }}</h2>
+
+		<ul>
+		    <li>Description : {{ object.description }}</li>
+		    <li>Created on : {{ object.created_on }}</li>
+		    <li>Modified on : {{ object.modified_on }}</li>
+		    <li>Jobs : {{ object.job.select_related|join:", " }}</li>
+		</ul>
+
+		<a href="{% url joblist_edit id %}">edit</a>&nbsp;-&nbsp;<a href="{% url joblist_delete id %}">delete</a>
+	</div>
+
+{% endblock %}

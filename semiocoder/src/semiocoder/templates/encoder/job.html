@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Mes jobs{% endblock %}
+
+{% block stylesheet %} 
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/smoothness/jquery-ui-1.8.22.custom.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/jquery.dataTables_themeroller.css" />
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript" src="/static/js/dataTables/jquery.dataTables.min.js"></script>
+	<script type="text/javascript">
+	$(document).ready(function() {
+		$('#job_table').dataTable( {
+			"bJQueryUI": true,
+	        "sPaginationType": "full_numbers",
+			"bProcessing": true,
+			"bServerSide": true,
+			"sAjaxSource": "{% url job_data %}",
+			"aoColumns": [
+			               { "sWidth": "20%" },
+			               { "sWidth": "50%" },
+			               { "sWidth": "15%", sClass: "alignCenter", },
+			               { "sWidth": "15%", sClass: "alignCenter", },
+			             ]
+		} );
+	} );
+	</script>
+	
+{% endblock %}
+
+{% block content %}
+	<div class="box">
+		<h2>Mes jobs</h2>
+		<table id="job_table">
+		    <thead>
+			<tr>
+			    <th>name</th>
+			    <th>description</th>
+			    <th>encoder</th>
+			    <th>extension</th>
+			</tr>
+		    </thead>
+		    <tbody>
+		
+		    </tbody>
+		</table>
+	</div>
+
+{% endblock %}
+
+
+
+

@@ -1,0 +1,24 @@
+from django.conf.urls.defaults import patterns, include, url
+from django.views import static
+from django.views.generic.simple import direct_to_template
+from semiocoder import settings
+from semiocoder.core.libs import getAARFeed
+
+# Uncomment the next two lines to enable the admin:
+from django.contrib import admin
+admin.autodiscover()
+
+urlpatterns = patterns('',
+
+    url(r'^$', direct_to_template, { 'template': 'home.html', 'extra_context' : { 'news' : getAARFeed(), }, }, name="home"),
+    url(r'^contact/$', direct_to_template, {'template': 'contact.html'}, name="contact"),
+    url(r'^about/$', direct_to_template, {'template': 'about.html'}, name="about"),
+    url(r'^%s$' % settings.LOGIN_URL[1:], 'django.contrib.auth.views.login', {'template_name' : 'registration/login.html'}, name="login"),
+    url(r'^%s$' % settings.LOGOUT_URL[1:], 'django.contrib.auth.views.logout', {'next_page' : '/'}, name="logout"),
+    url(r'^user/change_password$', 'django.contrib.auth.views.password_change', {'template_name' : 'registration/password_change.html', 'post_change_redirect' : '/'}),
+    (r'^encoding/', include('encoder.urls')),
+    (r'^admin/', include(admin.site.urls)),
+    (r'^%s(?P<path>.*)$' % settings.STATIC_URL[1:], static.serve, {'document_root' : settings.STATIC_ROOT}),
+    (r'^%s(?P<path>.*)$' % settings.MEDIA_URL[1:], static.serve, {'document_root' : settings.MEDIA_ROOT}),
+
+)

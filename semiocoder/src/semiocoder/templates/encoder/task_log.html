@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Log for {{ th.joblist }}{% endblock %}
+
+{% block content %}
+
+	<div class="box">
+		<h2>Log for {{ th.joblist }}</h2>
+		{% autoescape off %}
+			{{ th.log|linebreaksbr }}
+		{% endautoescape %}
+	</div>
+
+{% endblock %}

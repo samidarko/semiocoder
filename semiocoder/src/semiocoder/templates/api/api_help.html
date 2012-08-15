@@ -1,0 +1,145 @@
+
+{% extends "api/api.html" %}
+
+
+{% block content %}
+
+<pre>
+
+This is Semiocoder API documentation page: please, make sure to know what you do !
+
+Parameters:
+
+format         - The format of the output
+		 One value: xml, json (later csv and txt)
+		 Default: xml
+		 
+action         - What action you would like to perform
+		 One value: login, logout, help, 
+		 Default: help
+
+		 
+*** *** *** *** *** *** *** *** *** ***  Modules  *** *** *** *** *** *** *** *** *** *** 
+
+<b>* action=login *</b>
+
+This module only accepts POST requests
+Parameters:
+  username       - User Name
+  password       - Password
+  
+	!!! under development !!!
+  
+  
+<b>* action=logout *</b>
+	Logout an clear session
+This module only accepts GET requests
+
+
+
+<b>* action=getencoders *</b>
+	Returns all available encoders
+
+This module only accepts GET requests
+
+
+<b>* action=getencoderdetails *</b>
+	Returns properties of selected encoder
+
+This module only accepts GET requests
+Parameters:
+  id         - Encoder Id
+
+<b>* action=getjobs *</b>
+	Returns all set jobs
+
+This module only accepts GET requests
+
+
+<b>* action=getjobdetails *</b>
+	Returns properties of selected job
+
+This module only accepts GET requests
+Parameters:
+  id         - Job Id
+
+
+<b>* action=getjoblists *</b>
+	Returns all set joblists
+
+This module only accepts GET requests
+
+
+<b>* action=getjoblistdetails *</b>
+	Returns properties of selected joblist
+
+This module only accepts GET requests
+Parameters:
+  id         - Joblist Id
+
+
+<b>* action=gettasks *</b>
+	Returns all set tasks
+
+This module only accepts GET requests
+
+
+<b>* action=gettaskdetails *</b>
+	Returns properties of selected task
+
+This module only accepts GET requests
+Parameters:
+  id         - Joblist Id
+
+
+<b>* action=gethistories *</b>
+	Returns all histories
+
+This module only accepts GET requests
+
+
+<b>* action=gethistorydetails *</b>
+	Returns properties of selected history
+
+This module only accepts GET requests
+Parameters:
+  id         - History Id
+
+
+<b>* action=getfile *</b>
+
+	!!! under development !!!
+	
+<b>* action=setjob *</b>
+
+This module only accepts POST requests
+Parameters:
+  name         - Job Name
+  description  - Description
+  encoder      - Encoder ID
+  options      - Encoding Options
+  
+
+<b>* action=setjoblist *</b>
+
+This module only accepts POST requests
+Parameters:
+  name         - Job Name
+  description  - Description
+  job	       - Related Jobs
+
+  
+<b>* action=settask *</b>
+
+This module only accepts POST requests
+Parameters:
+  joblist      - Joblist Id
+  schedule     - Scheduled Time (YYYY-mm-dd HH:MM:ss )
+  source_file  - File to Encode
+  notify       - Notification (Set "1" to notify User, set "2" for Group and leave empty to disable)
+  
+
+</pre>
+
+{% endblock %}
+

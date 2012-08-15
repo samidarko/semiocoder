@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+	{% block title %}Bienvenue sur Semiocoder{% endblock %}
+
+		{% block content %}
+			<div class="box">
+				<h2>Bienvenue sur Semiocoder</h2>
+				<p>
+					<strong>Semiocoder</strong>, est un outil dédié à l'encodage et développé pour les <a title="Archives Audiovisuelles de la Recherche" href="http://www.archivesaudiovisuelles.fr">AAR</a>. 
+					Son objectif est de permettre l'industrialisation l'encodage de vidéos dans des formats prédéfinis par l'utilisateur. Les système est ouvert a différents outils de compréssion vidéos en ligne de commande 
+					tels que <a href="http://ffmpeg.org/">ffmpeg</a> ou <a href="http://www.mplayerhq.hu">mencoder</a>. Le choix de leur implémentation revient à l'administrateur. L'utilisateur peut ensuite choisir l'encodeur de son choix mais doit connaitre au prélable les options 
+					adéquates pour configurer son job d'encodage. Chaque job d'encodage est contenu dans une joblist. Cette dernière est planifiée dans task qui sera lancée par le planificateur interne. 
+				</p>
+			</div>
+			<div class="box" id="content-box1">
+				<h3>Les cinq missions du programme AAR</h3>
+				<ul class="section-list">
+					<li class="first">
+						<span>Constitution de patrimoines scientifiques et culturels numériques, <a title="Les cinq missions du programme AAR" href="http://www.msh-paris.fr/fr/diffusion/archives-audiovisuelles/">...</a></span>
+					</li>
+					<li>
+						<span>Ingénierie sémiotique et informatique des fonds audiovisuels et multimédias <a title="Les cinq missions du programme AAR" href="http://www.msh-paris.fr/fr/diffusion/archives-audiovisuelles/">...</a></span>
+					</li>
+					<li>
+						<span>Publication, sous forme de sites thématiques multimédias, <a title="Les cinq missions du programme AAR" href="http://www.msh-paris.fr/fr/diffusion/archives-audiovisuelles/">...</a></span>
+					</li>
+					<li>
+						<span>Conception et développement de ressources scientifiques, <a title="Les cinq missions du programme AAR" href="http://www.msh-paris.fr/fr/diffusion/archives-audiovisuelles/">...</a></span>
+					</li>
+					<li class="last">
+						<span>Mise en place de partenariats avec des organismes publics et privés <a title="Les cinq missions du programme AAR" href="http://www.msh-paris.fr/fr/diffusion/archives-audiovisuelles/">...</a></span>
+					</li>
+				</ul>
+			</div>
+			<div class="box" id="content-box2">
+				<h3>Webothèque</h3>
+				<p>
+					On parle des Archives Audiovisuelles de la Recherche sur le web
+				</p>
+				<ul class="list">
+					<li class="first"><a href="http://laboiteaoutils.blogspot.com/2009/12/les-archives-audiovisuelles-de-la.html">La Boite à Outils des Historiens</a></li>
+					<li><a href="http://www.archeophile.com/rwcat_105-recherche-et-enseignement.htm">archeophile.com</a></li>
+					<li><a href="http://www.international.uqam.ca/pages/detailNouvelle.aspx?id=243">Université du Québec à Montréal</a></li>
+					<li><a href="http://www.sociopole.cnrs.fr/search/all/archives%20audiovisuelles%20recherche">Sociopôle</a></li>
+					<li><a href="http://www.alliancefrto.it/spip.php?site44">Alliance Française</a></li>
+					<li><a href="http://www.ethno-info.com/index.php?id=102">Ethno-Info.com</a></li>
+					<li><a href="http://wiki.univ-paris5.fr/wiki/Multim%C3%A9dia">Wiki de l'Université de Paris Descartes</a></li>
+					<li class="last"><a href="http://www.archivesaudiovisuelles.fr/FR/Links.asp">...</a></li>
+				</ul>
+			</div>
+		{% endblock %}

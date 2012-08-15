@@ -1,0 +1,151 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!--
+Design by Free CSS Templates
+http://www.freecsstemplates.org
+Released for free under a Creative Commons Attribution 3.0 License
+
+Name       : Big Business 2.0
+Description: A two-column, fixed-width design with a bright color scheme.
+Version    : 1.0
+Released   : 20120624
+-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<title>{% block title %}{% endblock %}</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/style.css" />
+{% block stylesheet %}{% endblock %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery-1.7.1.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.dropotron-1.0.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.slidertron-1.1.js"></script>
+<script type="text/javascript">
+	$(function() {
+		$('#menu > ul').dropotron({
+			mode: 'fade',
+			globalOffsetY: 11,
+			offsetY: -15
+		});
+	});
+</script>
+{% block scripts %}{% endblock %}
+</head>
+<body>
+<div id="wrapper">
+	<div id="header">
+		<div id="logo">
+			<h1><a href="/">Semiocoder</a></h1>
+		</div>
+		<div id="slogan">
+			
+			{% if user.is_authenticated %}
+				 <h2>Bonjour, <b>{{ user.username }}</b>. <a href="{% url logout %}" title="Log out from SemioCoder">Logout</a></h2>
+			{% else %}
+				<h2>Bonjour. Merci de vous <a href="{% url login %}" title="Log on">connecter</a></h2>
+			{% endif %}
+			
+		</div>
+	</div>
+	<div id="menu">
+		<ul>
+			<li><a href="{% url home %}">Home</a></li>
+			<li>
+				<span class="opener">Task<b></b></span>
+				<ul>
+					<li><a href="{% url tasks %}">Task list</a></li>
+					<li><a href="{% url task_add %}">Add task</a></li>
+					<li><a href="{% url task_history %}">Task history</a></li>
+				</ul>
+			</li>
+			<li>
+				<span class="opener">Joblist<b></b></span>
+				<ul>
+					<li><a href="{% url joblists %}">Joblist list</a></li>
+					<li><a href="{% url joblist_add %}">Add joblist</a></li>
+				</ul>
+			</li>
+			<li>
+				<span class="opener">Job<b></b></span>
+				<ul>
+					<li><a href="{% url jobs %}">Job list</a></li>
+					<li><a href="{% url job_add %}">Add job</a></li>
+				</ul>
+			</li>
+			<li><a href="{% url search %}">Search</a></li>
+			<li><a href="{% url contact %}">Contact</a></li>
+			<li class="last"><a href="{% url about %}">About</a></li>
+		</ul>
+		<br class="clearfix" />
+	</div>
+	<div id="page">
+		<div id="content">
+			{% if messages %}
+	        <ul class="messagelist">
+	        	{% for message in messages %}
+	          		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+				{% endfor %}
+			</ul>
+    		{% endif %}
+			{% block content %}{% endblock %}
+			<br class="clearfix" />
+		</div>
+		<div id="sidebar">
+			<div class="box">
+				<h3>Sites partenaires</h3>
+				<ul class="list">
+					<li class="first"><a title="Université Ouverte des Humanités" href="http://www.uoh.fr/">Université Ouverte</a></li>
+					<li><a href="http://www.decryptimages.net/index.php?option=com_content&view=article&id=286:aar&catid=68:divers&Itemid=70">Décryptimages</a></li>
+					<li><a title="Ecole des Hautes Etude en Sciences Sociales" href="http://www.ehess.fr/fr/ressources-documentaires/videotheque-numerique/">Vidéothèque numérique</a></li>
+					<li><a href="http://www.reseau-asie.com/cgi-bin/prog/index.cgi?langue=fr">Réseau Asie</a></li>
+					<li class="last"><a href="http://www.archivesaudiovisuelles.fr/FR/Links.asp">...</a></li>
+				</ul>
+			</div>
+			{% if news %}
+			<div class="box">
+				<h3>AAR News</h3>
+				<div class="date-list">
+					<ul class="list date-list">
+					
+						{% for item in news %}
+							
+							{% if forloop.first %}
+								<li class="first"><span class="date">{{ item.date.day }}/{{ item.date.month }}</span> <a title="{{ item.title }}" href="{{ item.link }}">{{ item.title|truncatewords:2  }}</a></li>
+							{% else %}{% if forloop.last %}
+								<li class="last"><span class="date">{{ item.date.day }}/{{ item.date.month }}</span> <a title="{{ item.title }}" href="{{ item.link }}">{{ item.title|truncatewords:2  }}</a></li>
+							{% else %}
+								<li><span class="date">{{ item.date.day }}/{{ item.date.month }}</span> <a title="{{ item.title }}" href="{{ item.link }}">{{ item.title|truncatewords:2  }}</a></li>
+							{% endif %}{% endif %}
+						
+						{% endfor %}
+
+					</ul>
+				</div>
+			</div>
+			{% endif %}		
+		</div>
+		<br class="clearfix" />
+	</div>
+	<div id="page-bottom">
+		<div id="page-bottom-content">
+			<h3>Archives Audiovisuelles de la Recherche</h3>
+			<p>
+				Libre d'accès, les archives réunissent aujourd’hui 5365 heures de vidéos documentant les grands enjeux et interrogations dans toutes les disciplines des sciences humaines et sociales. Un réseau international de 2390 chercheurs, enseignants, experts, professionnels, artistes et écrivains, personnalités de la société civile, décideurs ou "simples" témoins issus de plus de 70 pays vous offre un patrimoine de connaissances exceptionnel en 15 langues à travers 357 entretiens, 166 colloques et journées d’étude, 68 séminaires de recherche et 50 reportages et documentaires. 
+			</p>
+		</div>
+		<div id="page-bottom-sidebar">
+			<h3>Liens</h3>
+			<ul class="list">
+				<li class="first"><a title="Les Archives Audiovisuelles de la Recherche" href="http://www.archivesaudiovisuelles.fr">Les Archives</a></li>
+				<li><a title="Equipe Sémiotique Cognitive et Nouveaux Médias" href="http://www.semionet.fr">ESCoM</a></li>
+				<li class="last"><a title="fondation maison des sciences de l'homme" href="http://www.msh-paris.fr/">MSH Paris</a></li>
+			</ul>
+		</div>
+		<br class="clearfix" />
+	</div>
+</div>
+<div id="footer">
+	Copyright (c) 2012 Semiocoder.com. All rights reserved. Design by <a href="http://www.freecsstemplates.org">FCT</a>. 
+</div>
+</body>
+</html>

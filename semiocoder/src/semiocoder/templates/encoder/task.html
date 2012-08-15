@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Mes taches{% endblock %}
+
+{% block stylesheet %} 
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/smoothness/jquery-ui-1.8.22.custom.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/jquery.dataTables_themeroller.css" />
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/dataTables/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery.timers.js"></script>
+	<script type="text/javascript">
+	var oTable;
+	$(document).ready(function() {
+		oTable = $('#task_table').dataTable( {
+			"bJQueryUI": true,
+	        "sPaginationType": "full_numbers",
+			"bProcessing": true,
+			"bServerSide": true,
+			"sAjaxSource": "{% url task_data %}",
+			"aoColumns": [
+			               { "sWidth": "15%" },
+			               { "sWidth": "15%", sClass: "alignCenter", },
+			               { "sWidth": "30%", sClass: "alignCenter", },
+			               { "sWidth": "10%", sClass: "alignCenter", },
+			               { "sWidth": "10%", sClass: "alignCenter", },
+			               { "sWidth": "10%", sClass: "alignCenter", },
+			               { "sWidth": "10%", sClass: "alignCenter", },
+			             ]
+		} );
+	} );
+	
+	$(document).everyTime(20000, function() {
+		oTable.fnDraw();
+		});
+	
+	</script>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="box">
+	<h2>Mes taches</h2>
+
+<table id="task_table">
+    <thead>
+	<tr>
+		<th>task</th>
+	    <th>joblist</th>
+	    <th>schedule</th>
+	    <th>state</th>
+	    <th>notification</th>
+	    <th>edit</th>
+	    <th>delete</th>
+	</tr>
+    </thead>
+    <tbody>
+
+    </tbody>
+</table>
+</div>
+
+{% endblock %}
+

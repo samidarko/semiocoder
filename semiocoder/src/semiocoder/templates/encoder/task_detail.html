@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}Detail du task : {{ object.joblist.name }}{% endblock %}
+
+{% block content %}
+
+	<div class="box">
+		<h2>Detail du task : {{ object.joblist.name }}</h2>
+
+		<ul>
+		    <li>Scheduled : {{ object.schedule }}</li>
+		    <li>State : {% if object.state == 'W' %} waiting {% else %}
+		    			{% if object.state == 'P' %} pending {% else %}
+		    			{% if object.state == 'R' %} running {% else %}
+		    			{% endif %}{% endif %}{% endif %}
+		    </li>
+		    <li>Source file : {{ object.source_file }}</li>
+		    <li>Output jobs : {{ object.joblist.job.select_related|length }}</li>
+		    <li>Notify  : {{ object.notify  }}</li>
+			
+		</ul>
+
+		{% if object.state == 'W' %}
+		<a href="{% url task_edit id %}">edit</a>&nbsp;-&nbsp;<a href="{% url task_delete id %}">delete</a>
+		{% endif %}
+	</div>
+
+{% endblock %}
