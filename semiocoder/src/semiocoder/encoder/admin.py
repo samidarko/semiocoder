@@ -9,14 +9,14 @@ admin.site.register(Encoder, EncoderAdmin)
 
 
 class JoblistAdmin(admin.ModelAdmin):
-    list_display = ( 'name', 'created_by', 'description', )
+    list_display = ( 'name', 'owner', 'description', )
     search_fields = ('name', 'description', )
 
 admin.site.register(Joblist, JoblistAdmin)
 
 
 class JobAdmin(admin.ModelAdmin):
-    list_display = ('name', 'created_by', 'encoder', 'extension', 'created_on', 'modified_on')
+    list_display = ('name', 'owner', 'encoder', 'extension', 'created_on', 'modified_on')
     search_fields = ('name', 'description', 'options', )
 
 admin.site.register(Job, JobAdmin)

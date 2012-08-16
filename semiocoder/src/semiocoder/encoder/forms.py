@@ -6,7 +6,7 @@ class JoblistForm(forms.ModelForm):
     
     def __init__(self, user, *args, **kwargs):
         super(JoblistForm, self).__init__(*args, **kwargs)
-        self.fields['job'] = forms.ModelMultipleChoiceField(Job.objects.filter(created_by=user)) # On filtre le queryset par utilisateur
+        self.fields['job'] = forms.ModelMultipleChoiceField(Job.objects.filter(owner=user)) # On filtre le queryset par utilisateur
     
     class Meta:
         model = Joblist
@@ -25,7 +25,7 @@ class TaskForm(forms.ModelForm):
     def __init__(self, user, *args, **kwargs):
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['schedule'] = forms.DateTimeField(initial=datetime.now().strftime('%d/%m/%Y %H:%M'))
-        self.fields['joblist'] = forms.ModelChoiceField(Joblist.objects.filter(created_by=user)) # On filtre le queryset par utilisateur
+        self.fields['joblist'] = forms.ModelChoiceField(Joblist.objects.filter(owner=user)) # On filtre le queryset par utilisateur
     
     class Meta:
         model = Task

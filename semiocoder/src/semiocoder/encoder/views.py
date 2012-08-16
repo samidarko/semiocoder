@@ -16,7 +16,7 @@ from libs import getJobs, getTasks, getHistory
 # TODO: rendre le site multi langue ?
 # TODO: javascript pour tester les formaires ?
 # TODO: centraliser les themes pour les plugin javascript
-# TODO: revoir la redirection suite a connexion
+# TODO: Ajouter des liens "ADD" depuis les pages list 
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche

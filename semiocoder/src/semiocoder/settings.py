@@ -1,7 +1,7 @@
 # Django settings for semiocoder project.
 import os
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -87,9 +87,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'semiocoder.urls'
-LOGIN_URL = '/user/login'
-LOGOUT_URL = '/user/logout'
-LOGIN_REDIRECT_URL = '/'
+LOGIN_URL = '/login'
+LOGOUT_URL = '/logout'
 
 # Email configuration
 EMAIL_HOST = 'smtp.free.fr'

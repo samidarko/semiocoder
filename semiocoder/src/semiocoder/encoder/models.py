@@ -55,6 +55,7 @@ class Joblist(models.Model):
                 details[name] =  self.__dict__[name]
         return details
     
+# TODO: si on supprime purger source_file 
 class Task(models.Model):
     joblist = models.ForeignKey(Joblist)
     schedule = models.DateTimeField()
