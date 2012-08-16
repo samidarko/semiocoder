@@ -18,12 +18,12 @@ class Extension(models.Model):
         return ".%s" % (self.name)
 
 class Job(models.Model):
-    name = models.CharField(max_length=30)
-    description = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField("nom", max_length=30)
+    description = models.CharField("description", max_length=100, null=True, blank=True)
     owner = models.ForeignKey(User)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now = True)
-    encoder = models.ForeignKey(Encoder)
+    encoder = models.ForeignKey(Encoder, verbose_name="encodeur")
     options = models.CharField(max_length=240)
     extension = models.ForeignKey(Extension)
     
@@ -38,7 +38,7 @@ class Job(models.Model):
         return details
 
 class Joblist(models.Model):
-    name = models.CharField(max_length=30)
+    name = models.CharField("nom", max_length=30)
     description = models.CharField(max_length=100, null=True, blank=True)
     owner = models.ForeignKey(User)
     created_on = models.DateTimeField(auto_now_add=True)
@@ -58,11 +58,11 @@ class Joblist(models.Model):
 # TODO: si on supprime purger source_file 
 class Task(models.Model):
     joblist = models.ForeignKey(Joblist)
-    schedule = models.DateTimeField()
+    schedule = models.DateTimeField("planification")
     owner = models.ForeignKey(User)
     state = models.CharField(max_length=1, choices=(('W','Waiting'),('P','Pending'),('R','Running'),), default='W')
-    source_file = models.FileField(upload_to="videos/%Y%m%d_%H%M%S")
-    notify = models.BooleanField()
+    source_file = models.FileField("fichier source", upload_to="videos/%Y%m%d_%H%M%S")
+    notify = models.BooleanField("notification")
     
     def __unicode__(self):
         return "task %d" % (self.id)

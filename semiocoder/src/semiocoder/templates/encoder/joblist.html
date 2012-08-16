@@ -4,16 +4,6 @@
 
 {% block scripts %}
 	<script type="text/javascript" src="/static/js/jsTree/jquery.jstree.js"></script>
-{% endblock %}
-
-
-{% block content %}
-
-<div class="box">
-	<h2>Mes joblists</h2>
-
-	<div id="joblist_tree"></div>
-
 	<script type="text/javascript">
 	
 	$(function () {
@@ -77,7 +67,7 @@
 	            "data" : [
 	                {% for j in joblist_list %}
 	                {
-	                    "data" : { "title" : "<b>{{ j.name }}</b><i> - (created by {{ j.owner }})</i>", "attr" : { "href" : "{% url joblist_detail j.id %}" } },
+	                    "data" : { "title" : "<b>{{ j.name }}</b><i> - (créé par {{ j.owner }})</i>", "attr" : { "href" : "{% url joblist_detail j.id %}" } },
 	                    "attr" : { "id" : "_{{ j.id }}", "rel" : "joblist", "class" : "joblist-row" },
 	                    "state" : "closed"
 	                },
@@ -95,6 +85,17 @@
 	});
 	
 	</script>
+{% endblock %}
+
+
+{% block content %}
+
+<div class="box">
+	<h2>Mes joblists</h2>
+	<div class="addLink"><a href="{% url joblist_add %}" title="">Ajouter une joblist</a></div>
+	<div id="joblist_tree"></div>
+
+	
 </div>
 {% endblock %}
 

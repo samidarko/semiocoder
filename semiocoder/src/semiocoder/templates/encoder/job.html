@@ -32,12 +32,13 @@
 {% block content %}
 	<div class="box">
 		<h2>Mes jobs</h2>
+		<div class="addLink"><a href="{% url job_add %}" title="">Ajouter un job</a></div>
 		<table id="job_table">
 		    <thead>
 			<tr>
-			    <th>name</th>
+			    <th>nom</th>
 			    <th>description</th>
-			    <th>encoder</th>
+			    <th>encodeur</th>
 			    <th>extension</th>
 			</tr>
 		    </thead>

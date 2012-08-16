@@ -9,14 +9,14 @@
 
 		<ul>
 		    <li>Description : {{ object.description }}</li>
-		    <li>Created on : {{ object.created_on }}</li>
-		    <li>Modified on : {{ object.modified_on }}</li>
-		    <li>Encoder : {{ object.encoder.name }}</li>
+		    <li>Créé le : {{ object.created_on }}</li>
+		    <li>Modifié le : {{ object.modified_on }}</li>
+		    <li>Encodeur : {{ object.encoder.name }}</li>
 		    <li>Options : {{ object.options }}</li>
 		    <li>Extension : {{ object.extension }}</li>
 		</ul>
 
-		<a href="{% url job_edit id %}">edit</a>&nbsp;-&nbsp;<a href="{% url job_delete id %}">delete</a>
+		<a href="{% url job_edit id %}">Editer</a>&nbsp;-&nbsp;<a href="{% url job_delete id %}">Supprimer</a>
 	</div>
 
 {% endblock %}

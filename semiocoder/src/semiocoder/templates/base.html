@@ -40,41 +40,41 @@ Released   : 20120624
 		<div id="slogan">
 			
 			{% if user.is_authenticated %}
-				 <h2>Bonjour, <b>{{ user.username }}</b>. <a href="{% url logout %}" title="Log out from SemioCoder">Logout</a></h2>
+				 <h2>Bonjour, <b>{{ user.username }}</b>. <a href="{% url logout %}" title="Log out from SemioCoder">Déconnexion</a></h2>
 			{% else %}
-				<h2>Bonjour. Merci de vous <a href="{% url login %}" title="Log on">connecter</a></h2>
+				<h2>Bonjour. Merci de vous <a href="{% url login %}" title="Connexion">connecter</a></h2>
 			{% endif %}
 			
 		</div>
 	</div>
 	<div id="menu">
 		<ul>
-			<li><a href="{% url home %}">Home</a></li>
+			<li><a href="{% url home %}">Accueil</a></li>
 			<li>
-				<span class="opener">Task<b></b></span>
+				<span class="opener">Taches<b></b></span>
 				<ul>
-					<li><a href="{% url tasks %}">Task list</a></li>
-					<li><a href="{% url task_add %}">Add task</a></li>
-					<li><a href="{% url task_history %}">Task history</a></li>
+					<li><a href="{% url tasks %}">Liste des taches</a></li>
+					<li><a href="{% url task_add %}">Ajouter une tache</a></li>
+					<li><a href="{% url task_history %}">Historique des taches</a></li>
 				</ul>
 			</li>
 			<li>
-				<span class="opener">Joblist<b></b></span>
+				<span class="opener">Joblists<b></b></span>
 				<ul>
-					<li><a href="{% url joblists %}">Joblist list</a></li>
-					<li><a href="{% url joblist_add %}">Add joblist</a></li>
+					<li><a href="{% url joblists %}">Liste des joblists</a></li>
+					<li><a href="{% url joblist_add %}">Ajouter une joblist</a></li>
 				</ul>
 			</li>
 			<li>
-				<span class="opener">Job<b></b></span>
+				<span class="opener">Jobs<b></b></span>
 				<ul>
-					<li><a href="{% url jobs %}">Job list</a></li>
-					<li><a href="{% url job_add %}">Add job</a></li>
+					<li><a href="{% url jobs %}">Liste des jobs</a></li>
+					<li><a href="{% url job_add %}">Ajouter un job</a></li>
 				</ul>
 			</li>
-			<li><a href="{% url search %}">Search</a></li>
+			<li><a href="{% url search %}">Rechercher</a></li>
 			<li><a href="{% url contact %}">Contact</a></li>
-			<li class="last"><a href="{% url about %}">About</a></li>
+			<li class="last"><a href="{% url about %}">A propos</a></li>
 		</ul>
 		<br class="clearfix" />
 	</div>

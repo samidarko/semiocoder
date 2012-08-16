@@ -5,23 +5,23 @@
 {% block content %}
 
 	<div class="box">
-		<h2>Detail du task : {{ object.joblist.name }}</h2>
+		<h2>Detail de la tache : {{ object.joblist.name }}</h2>
 
 		<ul>
-		    <li>Scheduled : {{ object.schedule }}</li>
-		    <li>State : {% if object.state == 'W' %} waiting {% else %}
+		    <li>Planification : {{ object.schedule }}</li>
+		    <li>Etat : {% if object.state == 'W' %} waiting {% else %}
 		    			{% if object.state == 'P' %} pending {% else %}
 		    			{% if object.state == 'R' %} running {% else %}
 		    			{% endif %}{% endif %}{% endif %}
 		    </li>
-		    <li>Source file : {{ object.source_file }}</li>
-		    <li>Output jobs : {{ object.joblist.job.select_related|length }}</li>
-		    <li>Notify  : {{ object.notify  }}</li>
+		    <li>Fichier source : {{ object.source_file }}</li>
+		    <li>Jobs en sortie : {{ object.joblist.job.select_related|length }}</li>
+		    <li>Notification  : {{ object.notify  }}</li>
 			
 		</ul>
 
 		{% if object.state == 'W' %}
-		<a href="{% url task_edit id %}">edit</a>&nbsp;-&nbsp;<a href="{% url task_delete id %}">delete</a>
+		<a href="{% url task_edit id %}">Editer</a>&nbsp;-&nbsp;<a href="{% url task_delete id %}">Supprimer</a>
 		{% endif %}
 	</div>
 

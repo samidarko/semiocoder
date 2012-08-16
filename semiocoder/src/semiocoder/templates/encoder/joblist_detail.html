@@ -9,12 +9,12 @@
 
 		<ul>
 		    <li>Description : {{ object.description }}</li>
-		    <li>Created on : {{ object.created_on }}</li>
-		    <li>Modified on : {{ object.modified_on }}</li>
+		    <li>Créé le : {{ object.created_on }}</li>
+		    <li>Modifié le : {{ object.modified_on }}</li>
 		    <li>Jobs : {{ object.job.select_related|join:", " }}</li>
 		</ul>
 
-		<a href="{% url joblist_edit id %}">edit</a>&nbsp;-&nbsp;<a href="{% url joblist_delete id %}">delete</a>
+		<a href="{% url joblist_edit id %}">Editer</a>&nbsp;-&nbsp;<a href="{% url joblist_delete id %}">Supprimer</a>
 	</div>
 
 {% endblock %}

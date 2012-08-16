@@ -13,10 +13,9 @@ from django.contrib import messages
 from libs import getJobs, getTasks, getHistory
 
 # TODO: documentation
-# TODO: rendre le site multi langue ?
 # TODO: javascript pour tester les formaires ?
 # TODO: centraliser les themes pour les plugin javascript
-# TODO: Ajouter des liens "ADD" depuis les pages list 
+
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche
@@ -161,7 +160,7 @@ def job_create(request): # TODO: reprendre les messages des vues generiques pour
 
 @login_required(login_url=LOGIN_URL)
 def joblist_create(request):
-    data = { 'element' : 'joblist', 'title' : "Ajout d'un joblist", 'action' : reverse('joblist_add'), }
+    data = { 'element' : 'joblist', 'title' : "Ajout d'une joblist", 'action' : reverse('joblist_add'), }
     if request.method == 'POST':
         form = JoblistForm(request.user, request.POST, instance=Joblist(owner=request.user))
         if form.is_valid():
@@ -400,7 +399,7 @@ def joblist_job_detail_data(request, object_id):
     
     if job.owner == request.user:
         json_job_detail = [
-                        { 'data' : '<b>encoder</b> : <i>%s</i>' % job.encoder.name, 'attr' : { "rel" : "job_detail" , }, 'state' : 'closed', },
+                        { 'data' : '<b>encodeur</b> : <i>%s</i>' % job.encoder.name, 'attr' : { "rel" : "job_detail" , }, 'state' : 'closed', },
                         { 'data' : '<b>extension</b> : <i>%s</i>' % job.extension.name, 'attr' : { "rel" : "job_detail" , }, 'state' : 'closed', },
                         { 'data' : '<b>options</b> : <i>%s</i>' % job.options, 'attr' : { "rel" : "job_detail" , }, 'state' : 'closed', },
                         ]

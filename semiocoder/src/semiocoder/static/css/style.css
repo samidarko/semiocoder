@@ -433,6 +433,11 @@ ul h4 {
 }
 
 label {
-	width:150px;    /*Or however much space you need for the form’s labels*/
+	width:150px;    /*Or however much space you need for the formï¿½s labels*/
     float:left;
+}
+
+.addLink {
+	text-align: right;
+	margin-right: 10px;
 }
