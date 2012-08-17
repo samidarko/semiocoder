@@ -3,13 +3,13 @@
 {% block title %}Mes taches{% endblock %}
 
 {% block stylesheet %} 
-	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/smoothness/jquery-ui-1.8.22.custom.css" />
+	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.22.custom.css" />
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/jquery.dataTables_themeroller.css" />
 {% endblock %}
 
 {% block scripts %}
-	<script type="text/javascript" src="{{ STATIC_URL }}/js/dataTables/jquery.dataTables.min.js"></script>
-	<script type="text/javascript" src="{{ STATIC_URL }}/js/jquery.timers.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.dataTables.min.js"></script>
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.timers.js"></script>
 	<script type="text/javascript">
 	var oTable;
 	$(document).ready(function() {

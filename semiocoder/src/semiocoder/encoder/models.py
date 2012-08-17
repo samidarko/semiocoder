@@ -1,5 +1,8 @@
+import os
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.deletion import Collector
+from django.db import router
 
 
 class Encoder(models.Model):
@@ -54,8 +57,8 @@ class Joblist(models.Model):
             if not name.startswith('_'):
                 details[name] =  self.__dict__[name]
         return details
-    
-# TODO: si on supprime purger source_file 
+
+
 class Task(models.Model):
     joblist = models.ForeignKey(Joblist)
     schedule = models.DateTimeField("planification")
@@ -66,6 +69,26 @@ class Task(models.Model):
     
     def __unicode__(self):
         return "task %d" % (self.id)
+    
+    def delete(self, using=None):
+        """Surcharge de la methode save pour supprimer le fichier source avant l objet
+        """
+        using = using or router.db_for_write(self.__class__, instance=self)
+        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
+        
+        if self.source_file:
+            tab_path = self.source_file.name.split('/') # decoupage du chemin vers le fichier source
+            rep_path = os.path.join("media",tab_path[0],tab_path[1]) # recomposition du chemin du repertoire du fichier source 
+            self.source_file.delete() # suppression du fichier source
+            if len(os.listdir(rep_path)) == 0: # si le repertoire du fichier source est vide
+                try:
+                    os.rmdir(rep_path) # suppression du repertoire
+                except:
+                    pass # Si un probleme survient on ne fait rien
+                
+        collector = Collector(using=using)
+        collector.collect([self])
+        collector.delete()
     
     def getDetails(self):
         details = {}

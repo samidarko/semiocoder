@@ -4,7 +4,7 @@
 
 {% block stylesheet %}
 	{% if element == 'task' %}
-    	<link rel="stylesheet" href="{{ STATIC_URL }}css/smoothness/jquery-ui-1.8.22.custom.css"/>
+    	<link rel="stylesheet" href="{{ STATIC_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.22.custom.css"/>
     {% endif %}
 {% endblock %}
 
@@ -14,7 +14,7 @@
 	    <script type="text/javascript" src="{{ STATIC_URL }}js/jquery-ui-timepicker-addon.js"></script>
 	    <script type="text/javascript">    
 	    $(function() {
-	        $( "#id_schedule" ).datetimepicker({ minDate: 1, dateFormat : "dd/mm/yy", });
+	        $( "#id_schedule" ).datetimepicker({ minDate: 0, dateFormat : "dd/mm/yy", });
 	    });
 	    </script>
     {% endif %}

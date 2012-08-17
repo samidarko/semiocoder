@@ -48,7 +48,6 @@ def taskLaucher(t):
 #        notify(level=t.notify, history=th.id)
         
     # suppression de la tache
-    t.source_file.delete()
     t.delete()
     
     return "code retour : %d" % ret

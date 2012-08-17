@@ -10,11 +10,12 @@ from semiocoder.settings import LOGIN_URL
 from django.template.context import RequestContext
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.contrib import messages
+from django.utils.translation import ugettext
 from libs import getJobs, getTasks, getHistory
 
-# TODO: documentation
+# TODO: documentation + test
 # TODO: javascript pour tester les formaires ?
-# TODO: centraliser les themes pour les plugin javascript
+# TODO: Faire les tests unitaires
 
 
 @login_required(login_url=LOGIN_URL)
@@ -41,7 +42,7 @@ def job_delete(request, object_id):
     if request.method == 'POST':
         obj = get_object_or_404(Job, pk=object_id, owner=request.user)
         obj.delete()
-        msg = "The %(verbose_name)s was deleted." %  {"verbose_name": 'job'}
+        msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'job'}
         messages.success(request, msg, fail_silently=True)
         return redirect("jobs")
     else:
@@ -54,7 +55,7 @@ def joblist_delete(request, object_id):
     if request.method == 'POST':
         obj = get_object_or_404(Joblist, pk=object_id, owner=request.user)
         obj.delete()
-        msg = "The %(verbose_name)s was deleted." %  {"verbose_name": 'joblist'}
+        msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'joblist'}
         messages.success(request, msg, fail_silently=True)
         return redirect("joblists")
     else:
@@ -68,7 +69,7 @@ def task_delete(request, object_id):
         obj = get_object_or_404(Task, pk=object_id, owner=request.user)
         if obj.state == 'W':
             obj.delete()
-            msg = "The %(verbose_name)s was deleted." %  {"verbose_name": 'task'}
+            msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'task'}
             messages.success(request, msg, fail_silently=True)
         else:
             msg = 'The %(verbose_name)s can not be deleted because state is already "Pending" or "Running".'  %  {"verbose_name": 'task'}
@@ -90,7 +91,7 @@ def job_update(request, object_id):
         form = JobForm(request.POST, request.FILES, instance=obj)
         if form.is_valid():
             obj = form.save()
-            msg = "The %(verbose_name)s was updated successfully." % {"verbose_name": data["element"], }
+            msg = ugettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": data["element"], }
             messages.success(request, msg, fail_silently=True)
             return redirect('jobs')
     else:
@@ -111,7 +112,7 @@ def joblist_update(request, object_id):
         form = JoblistForm(request.user, request.POST, request.FILES, instance=obj)
         if form.is_valid():
             obj = form.save()
-            msg = "The %(verbose_name)s was updated successfully." % {"verbose_name": data["element"], }
+            msg = ugettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": data["element"], }
             messages.success(request, msg, fail_silently=True)
             return redirect('joblists')
     else:
@@ -131,7 +132,7 @@ def task_update(request, object_id):
         form = TaskForm(request.user, request.POST, request.FILES, instance=obj)
         if form.is_valid():
             obj = form.save()
-            msg = "The %(verbose_name)s was updated successfully." % {"verbose_name": data["element"], }
+            msg = ugettext("The %(verbose_name)s was updated successfully.") % {"verbose_name": data["element"], }
             messages.success(request, msg, fail_silently=True)
             return redirect('tasks')
     else:
@@ -143,13 +144,13 @@ def task_update(request, object_id):
     
 # Create
 @login_required(login_url=LOGIN_URL)
-def job_create(request): # TODO: reprendre les messages des vues generiques pour coherence
+def job_create(request):
     data = { 'element' : 'job', 'title' : "Ajout d'un job", 'action' : reverse('job_add'), }
     if request.method == 'POST':
         form = JobForm(request.POST, instance = Job(owner=request.user))
         if form.is_valid():
             form.save()
-            msg = "The %(verbose_name)s was created successfully."  % {"verbose_name": data['element']}
+            msg = ugettext("The %(verbose_name)s was created successfully.")  % {"verbose_name": data['element']}
             messages.success(request, msg, fail_silently=True)
             return redirect('jobs')
     else:
@@ -165,7 +166,7 @@ def joblist_create(request):
         form = JoblistForm(request.user, request.POST, instance=Joblist(owner=request.user))
         if form.is_valid():
             form.save()
-            msg = "The %(verbose_name)s was created successfully."  % {"verbose_name": data['element']}
+            msg = ugettext("The %(verbose_name)s was created successfully.")  % {"verbose_name": data['element']}
             messages.success(request, msg, fail_silently=True)
             return redirect('joblists')
     else:
@@ -181,7 +182,7 @@ def task_create(request): # TODO: empecher les dates anterieures
         form = TaskForm(request.user, request.POST, request.FILES, instance = Task(owner=request.user))
         if form.is_valid():
             form.save()
-            msg = "The %(verbose_name)s was created successfully." % {"verbose_name": data['element']}
+            msg = ugettext("The %(verbose_name)s was created successfully.") % {"verbose_name": data['element']}
             messages.success(request, msg, fail_silently=True)
             return redirect('tasks')
     else:
@@ -247,7 +248,7 @@ def task_output(request, object_id):
             filename = os.path.basename(f)
             try:
                 os.remove(f[1:])
-                msg = '%s deleted' % filename
+                msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'fichier %s' % filename}
                 messages.success(request, msg, fail_silently=True)
             except OSError:
                 msg = 'impossible to delete %s ' % filename
