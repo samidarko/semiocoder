@@ -1,12 +1,14 @@
+# -*- coding: utf-8 -*-
 from django import forms
 from datetime import datetime, timedelta
-from semiocoder.encoder.models import Joblist, Job, Task
+from semiocoder.encoder.models import Joblist, Job, Task, Encoder, Extension
 
 class JoblistForm(forms.ModelForm):
     
     def __init__(self, user, *args, **kwargs):
         super(JoblistForm, self).__init__(*args, **kwargs)
-        self.fields['job'] = forms.ModelMultipleChoiceField(Job.objects.filter(owner=user)) # On filtre le queryset par utilisateur
+        self.fields['name'] = forms.CharField(label='Nom * ')
+        self.fields['job'] = forms.ModelMultipleChoiceField(Job.objects.filter(owner=user), label='Jobs * ') # On filtre le queryset par utilisateur
     
     class Meta:
         model = Joblist
@@ -15,18 +17,24 @@ class JoblistForm(forms.ModelForm):
 
 class JobForm(forms.ModelForm):
 
+    name = forms.CharField(label='Nom * ')
+    encoder = forms.ModelChoiceField(Encoder.objects.all(), label='Encodeur * ') #, empty_label="------")
+    options = forms.CharField(label='Options * ')
+    extension = forms.ModelChoiceField(Extension.objects.all(), label='Extension * ') #, empty_label="------")
+
     class Meta:
         model = Job
         fields = ('name', 'description', 'encoder', 'options', 'extension', )
-
+        
 
 class TaskForm(forms.ModelForm):
     
     def __init__(self, user, *args, **kwargs):
         super(TaskForm, self).__init__(*args, **kwargs)
-        self.fields['schedule'] = forms.DateTimeField(initial=(datetime.now()+timedelta(minutes=10)).strftime('%d/%m/%Y %H:%M'))
-        self.fields['joblist'] = forms.ModelChoiceField(Joblist.objects.filter(owner=user)) # On filtre le queryset par utilisateur
-    
+        self.fields['joblist'] = forms.ModelChoiceField(Joblist.objects.filter(owner=user), label='Joblists * ') # On filtre le queryset par utilisateur
+        self.fields['schedule'] = forms.DateTimeField(initial=(datetime.now()+timedelta(minutes=10)).strftime('%d/%m/%Y %H:%M'), label='Planification * ')
+        self.fields['source_file'] = forms.FileField(label='Fichier source * ', help_text="(fichier à encoder)")
+
     class Meta:
         model = Task
         fields = ('joblist', 'schedule', 'source_file', 'notify')

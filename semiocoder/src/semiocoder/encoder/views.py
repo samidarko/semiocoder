@@ -14,13 +14,18 @@ from django.utils.translation import ugettext
 from libs import getJobs, getTasks, getHistory
 
 # TODO: documentation + test
-# TODO: javascript pour tester les formaires ?
+# TODO: Ameliorer le design des formulaires et des messages d'erreur
 # TODO: Faire les tests unitaires
 
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche
-    """
+    """Affichage du formulaire de recherche du site
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
     """
     query = request.GET.get('q', '')
     if query:
@@ -38,7 +43,15 @@ def search(request): # TODO: revoir les champs de recherche
 # Delete
 @login_required(login_url=LOGIN_URL)
 def job_delete(request, object_id):
-
+    """Supression d'un objet job
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet job à supprimer
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
     if request.method == 'POST':
         obj = get_object_or_404(Job, pk=object_id, owner=request.user)
         obj.delete()
@@ -46,7 +59,7 @@ def job_delete(request, object_id):
         messages.success(request, msg, fail_silently=True)
         return redirect("jobs")
     else:
-        return render_to_response('encoder/confirm_delete.html', { 'element' : 'Job', 'title' : 'Job delete confirmation'}, context_instance=RequestContext(request))
+        return render_to_response('encoder/confirm_delete.html', { 'element' : 'job', 'title' : 'Job delete confirmation'}, context_instance=RequestContext(request))
 
 
 @login_required(login_url=LOGIN_URL)
@@ -59,7 +72,7 @@ def joblist_delete(request, object_id):
         messages.success(request, msg, fail_silently=True)
         return redirect("joblists")
     else:
-        return render_to_response('encoder/confirm_delete.html', { 'element' : 'Joblist', 'title' : 'Joblist delete confirmation'}, context_instance=RequestContext(request))
+        return render_to_response('encoder/confirm_delete.html', { 'element' : 'joblist', 'title' : 'Joblist delete confirmation'}, context_instance=RequestContext(request))
 
 
 @login_required(login_url=LOGIN_URL)
@@ -76,7 +89,7 @@ def task_delete(request, object_id):
             messages.error(request, msg, fail_silently=True)
         return redirect("tasks")
     else:
-        return render_to_response('encoder/confirm_delete.html', { 'element' : 'Task', 'title' : 'Task delete confirmation'}, context_instance=RequestContext(request))
+        return render_to_response('encoder/confirm_delete.html', { 'element' : 'task', 'title' : 'Task delete confirmation'}, context_instance=RequestContext(request))
 
 # Update
 @login_required(login_url=LOGIN_URL)
