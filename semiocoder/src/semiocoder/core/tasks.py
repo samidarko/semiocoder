@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: tasks
+   :platform: Unix, Windows
+   :synopsis: Taches planifiées et asynchrones nécéssaires au fonctionnement interne de l'application encoder basé sur Celery
+
+.. moduleauthor:: Samuel Darko <samidarko@gmail.com>
+
+"""
 import os, subprocess, datetime
 from celery import task
 from celery.task import periodic_task
@@ -9,6 +18,16 @@ from semiocoder.encoder.models import Task, TaskHistory
 
 @task
 def taskLaucher(t):
+    """Affichage du formulaire de recherche du site
+    
+    :param t: objet Task
+    :type t: Task
+    
+    :returns: int
+        The return code::
+            0 -- Success!
+            1 -- No good.
+    """
     t.state = 'R'
     t.save()
     th = TaskHistory(joblist = t.joblist.name, owner = t.owner, starttime = datetime.datetime.now(), outputdir = t.source_file.url.split('/')[3])
@@ -50,13 +69,18 @@ def taskLaucher(t):
     # suppression de la tache
     t.delete()
     
-    return "code retour : %d" % ret
+    return ret
         
         
         
 
 @periodic_task(run_every=crontab(minute="*/5"))
 def taskScheduler():
+    """Tache périodique qui vérifie si tache planifiée doit être démarrée.
+    Si c'est le cas son statut change de "waiting" à "pending".
+    
+    :returns: int (le nombre de taches démarrées)
+    """
     
     tasks = Task.objects.filter(schedule__lte=datetime.datetime.now()).order_by('schedule')
     counter = 0
@@ -66,9 +90,7 @@ def taskScheduler():
             t.save()
             taskLaucher.delay(t)
             counter += 1
-    
-    pluralize = 'tasks' if counter > 1 else 'task'
 
-    return "%d %s launched" % (counter,pluralize)
+    return counter
 
     

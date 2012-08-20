@@ -1,3 +1,10 @@
 eclipse.preferences.version=1
+encoding//src/semiocoder/core/libs.py=utf-8
+encoding//src/semiocoder/core/tasks.py=utf-8
+encoding//src/semiocoder/doc/source/conf.py=utf-8
+encoding//src/semiocoder/encoder/admin.py=utf-8
 encoding//src/semiocoder/encoder/forms.py=utf-8
+encoding//src/semiocoder/encoder/libs.py=utf-8
+encoding//src/semiocoder/encoder/models.py=utf-8
+encoding//src/semiocoder/encoder/views.py=utf-8
 encoding//src/semiocoder/static/js/jquery.jstree.js=UTF-8

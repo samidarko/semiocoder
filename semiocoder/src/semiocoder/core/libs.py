@@ -1,9 +1,22 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: libs
+   :platform: Unix, Windows
+   :synopsis: Libraires de fonctions nécéssaire à l'application encodeur
+
+.. moduleauthor:: Samuel Darko <samidarko@gmail.com>
+
+"""
 import datetime, feedparser
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from semiocoder.encoder.models import TaskHistory
 
 def getAARFeed():
+    """Renvoi les 6 dernières nouvelles des AAR via leur flux RSS
+    
+    :returns: dict
+    """
     rss_url = 'http://www.archivesaudiovisuelles.fr/fr/rss/aar_rss.xml'
     feed = feedparser.parse(rss_url)
     news = []
@@ -14,20 +27,14 @@ def getAARFeed():
     return news
 
 
-def notify(level, history):
+def notify(history):
+    """Fonction de notification de l'utilisateur (A revoir)
+    
+    :returns: None
+    """
     semiocoder = User.objects.get(pk=1).email
     th = TaskHistory.objects.get(pk=history)
-    if level == 1:
-        addressee = [ User.objects.get(username__exact=th.owner).email ]
-    elif level == 2:
-        addressee = []
-        groups = User.objects.get(username__exact=th.owner).groups.select_related()
-        for g in groups:
-            for u in g.user_set.select_related():
-                addressee.append(u.email)
-        if not addressee: addressee = [ User.objects.get(username__exact=th.owner).email ]
-    else:
-        addressee = [ semiocoder ]
+    addressee = [ User.objects.get(username__exact=th.owner).email ]
 
     subject = str('La tache '+ th.joblist + ' s est termine avec le statut ' +th.state)
     from_email, to = semiocoder, addressee

@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: models
+   :platform: Unix, Windows
+   :synopsis: description du modèle de données l'application encodeur
+
+.. moduleauthor:: Samuel Darko <samidarko@gmail.com>
+
+"""
 import os
 from django.db import models
 from django.contrib.auth.models import User

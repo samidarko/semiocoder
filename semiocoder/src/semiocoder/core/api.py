@@ -49,7 +49,7 @@ def getEncoderDetails(encoder):
     return { 'encoder' : result }
 
     
-                
+
 def getEncoders():
     result = {}
     result["encoders"] = []

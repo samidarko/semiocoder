@@ -1,9 +1,35 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: libs
+   :platform: Unix, Windows
+   :synopsis: Libraires de fonctions n�c�ssaire � l'application encodeur
+
+.. moduleauthor:: Samuel Darko <samidarko@gmail.com>
+
+"""
 from django.db.models import Q
 from django.core.urlresolvers import reverse
 from semiocoder.settings import STATIC_URL
 from models import Job, Task, TaskHistory
 
 def getJobs(user, first_id, last_id, search_str=None, sort_by="name", asc=True):
+    """Fonction utilisée par la vue job_data et le plugin dataTable
+    
+    :param user: Utilisateur connecté et propriétaire des objets affichés
+    :type user: User
+    :param first_id: Premier objet
+    :type first_id: int
+    :param last_id: Dernier objet (pagination)
+    :type last_id: int
+    :param search_str: Paramètre passé par le champs "recherche"
+    :type search_str: Str
+    :param sort_by: Nom de la colonne pour le tri
+    :type sort_by: Str
+    :param asc: Order du tri, si positionné à vrai le tri est ascendant
+    :type asc: bool
+    
+    :returns: tuple
+    """
     
     sort_col = "%s"
     if not asc:
@@ -32,7 +58,23 @@ def getJobs(user, first_id, last_id, search_str=None, sort_by="name", asc=True):
 
 
 def getTasks(user, first_id, last_id, search_str=None, sort_by="name", asc=True):
+    """Fonction utilisée par la vue task_data et le plugin dataTable
     
+    :param user: Utilisateur connecté et propriétaire des objets affichés
+    :type user: User
+    :param first_id: Premier objet
+    :type first_id: int
+    :param last_id: Dernier objet (pagination)
+    :type last_id: int
+    :param search_str: Paramètre passé par le champs "recherche"
+    :type search_str: Str
+    :param sort_by: Nom de la colonne pour le tri
+    :type sort_by: Str
+    :param asc: Order du tri, si positionné à vrai le tri est ascendant
+    :type asc: bool
+    
+    :returns: tuple
+    """
     sort_col = "%s"
     if not asc:
         sort_col = "-" + sort_col
@@ -72,7 +114,23 @@ def getTasks(user, first_id, last_id, search_str=None, sort_by="name", asc=True)
 
 
 def getHistory(user, first_id, last_id, search_str=None, sort_by="name", asc=True):
+    """Fonction utilisée par la vue task_history_data et le plugin dataTable
     
+    :param user: Utilisateur connecté et propriétaire des objets affichés
+    :type user: User
+    :param first_id: Premier objet
+    :type first_id: int
+    :param last_id: Dernier objet (pagination)
+    :type last_id: int
+    :param search_str: Paramètre passé par le champs "recherche"
+    :type search_str: Str
+    :param sort_by: Nom de la colonne pour le tri
+    :type sort_by: Str
+    :param asc: Order du tri, si positionné à vrai le tri est ascendant
+    :type asc: bool
+    
+    :returns: tuple
+    """
     sort_col = "%s"
     if not asc:
         sort_col = "-" + sort_col

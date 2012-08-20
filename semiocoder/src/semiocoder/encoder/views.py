@@ -1,3 +1,12 @@
+# -*- coding: utf-8 -*-
+"""
+.. module:: views
+   :platform: Unix, Windows
+   :synopsis: Module des vues de l'encodeur
+
+.. moduleauthor:: Samuel Darko <samidarko@gmail.com>
+
+"""
 import os, json
 from django.db.models import Q
 from django.http import HttpResponse
@@ -16,13 +25,14 @@ from libs import getJobs, getTasks, getHistory
 # TODO: documentation + test
 # TODO: Ameliorer le design des formulaires et des messages d'erreur
 # TODO: Faire les tests unitaires
+# TODO: Mettre en place les notifications / rapport joint ?
 
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche
     """Affichage du formulaire de recherche du site
     
-    :param request: Param�tres de la requ�te HTTP
+    :param request: Paramètres de la requête HTTP
     :type request: HttpRequest
     
     :returns: HttpResponse
@@ -45,9 +55,9 @@ def search(request): # TODO: revoir les champs de recherche
 def job_delete(request, object_id):
     """Supression d'un objet job
     
-    :param request: Param�tres de la requ�te HTTP
+    :param request: Paramètres de la requête HTTP
     :type request: HttpRequest
-    :param object_id: Identifiant de l'objet job � supprimer
+    :param object_id: Identifiant de l'objet job à supprimer
     :type object_id: int
     
     :returns: HttpResponse
@@ -64,6 +74,15 @@ def job_delete(request, object_id):
 
 @login_required(login_url=LOGIN_URL)
 def joblist_delete(request, object_id):
+    """Supression d'un objet joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet joblist à supprimer
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
 
     if request.method == 'POST':
         obj = get_object_or_404(Joblist, pk=object_id, owner=request.user)
@@ -77,6 +96,15 @@ def joblist_delete(request, object_id):
 
 @login_required(login_url=LOGIN_URL)
 def task_delete(request, object_id):
+    """Supression d'un objet task
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet task à supprimer
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
 
     if request.method == 'POST':
         obj = get_object_or_404(Task, pk=object_id, owner=request.user)
@@ -94,7 +122,15 @@ def task_delete(request, object_id):
 # Update
 @login_required(login_url=LOGIN_URL)
 def job_update(request, object_id):
+    """Mise à jour d'un objet job
     
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet job à mettre à jour
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
 
     obj = get_object_or_404(Job, pk=object_id, owner=request.user)
 
@@ -116,6 +152,15 @@ def job_update(request, object_id):
 
 @login_required(login_url=LOGIN_URL)
 def joblist_update(request, object_id):
+    """Mise à jour d'un objet joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet joblist à mettre à jour
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
 
     obj = get_object_or_404(Joblist, pk=object_id, owner=request.user)
     
@@ -136,6 +181,15 @@ def joblist_update(request, object_id):
     
 @login_required(login_url=LOGIN_URL)
 def task_update(request, object_id):
+    """Mise à jour d'un objet task
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet task à mettre à jour
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
     
     obj = get_object_or_404(Task, pk=object_id, owner=request.user)
     
@@ -158,6 +212,14 @@ def task_update(request, object_id):
 # Create
 @login_required(login_url=LOGIN_URL)
 def job_create(request):
+    """Création d'un objet job
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
+    
     data = { 'element' : 'job', 'title' : "Ajout d'un job", 'action' : reverse('job_add'), }
     if request.method == 'POST':
         form = JobForm(request.POST, instance = Job(owner=request.user))
@@ -174,6 +236,14 @@ def job_create(request):
 
 @login_required(login_url=LOGIN_URL)
 def joblist_create(request):
+    """Création d'un objet joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
+    
     data = { 'element' : 'joblist', 'title' : "Ajout d'une joblist", 'action' : reverse('joblist_add'), }
     if request.method == 'POST':
         form = JoblistForm(request.user, request.POST, instance=Joblist(owner=request.user))
@@ -189,7 +259,15 @@ def joblist_create(request):
 
 
 @login_required(login_url=LOGIN_URL)
-def task_create(request): # TODO: empecher les dates anterieures
+def task_create(request):
+    """Création d'un objet task
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
+    
     data = { 'element' : 'task', 'title' : "Ajout d'une tache", 'action' : reverse('task_add'), }
     if request.method == 'POST':
         form = TaskForm(request.user, request.POST, request.FILES, instance = Task(owner=request.user))
@@ -207,45 +285,123 @@ def task_create(request): # TODO: empecher les dates anterieures
 # Object detail
 @login_required(login_url=LOGIN_URL)
 def job_detail(request, object_id):
+    """Affichages des détails d'un objet job
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet job à afficher
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
+    
     data = { 'element': 'job', 'id' : object_id, }
     return object_detail(request, Job.objects.filter(owner=request.user), object_id=object_id, template_name="encoder/job_detail.html", extra_context=data)
     
 
 @login_required(login_url=LOGIN_URL)
 def joblist_detail(request, object_id):
+    """Affichages des détails d'un objet joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet joblist à afficher
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
+    
     data = { 'element': 'joblist', 'id' : object_id, 'title' : 'Detail du joblist', }
     return object_detail(request, Joblist.objects.filter(owner=request.user), object_id=object_id, template_name="encoder/joblist_detail.html", extra_context=data)
     
     
 @login_required(login_url=LOGIN_URL)
 def task_detail(request, object_id):
+    """Affichages des détails d'un objet task
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet task à afficher
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
+    
     data = { 'element': 'task', 'id' : object_id, 'title' : 'Detail du task', }
     return object_detail(request, Task.objects.filter(owner=request.user), object_id=object_id, template_name="encoder/task_detail.html", extra_context=data)
     
 # Object list
 @login_required(login_url=LOGIN_URL)
 def job_list(request):
+    """Affichages de la liste des objets job
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
+    
     return render_to_response("encoder/job.html", context_instance=RequestContext(request))
 
 @login_required(login_url=LOGIN_URL)
 def joblist_list(request): # TODO: ajouter le champ de recherche jstree + bouton pour fermer tous les noeuds
+    """Affichages de la liste des objets joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
+    
     return render_to_response("encoder/joblist.html", { 'joblist_list' : Joblist.objects.filter(owner=request.user), }, context_instance=RequestContext(request))
 
 @login_required(login_url=LOGIN_URL)
 def task_list(request):
+    """Affichages de la liste des objets task
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     return render_to_response("encoder/task.html", context_instance=RequestContext(request))
 
 # Task specific
 @login_required(login_url=LOGIN_URL)
 def task_history(request):
+    """Affichages de l'historique des objets tâches
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     return render_to_response("encoder/task_history.html", context_instance=RequestContext(request))
 
 @login_required(login_url=LOGIN_URL)
 def task_log(request, object_id):
+    """Affichages de la log d'une tâche
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet historique de tâche à afficher
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
     return render_to_response('encoder/task_log.html', { 'th' : get_object_or_404(TaskHistory, pk=object_id, owner=request.user), }, context_instance=RequestContext(request))
 
 @login_required(login_url=LOGIN_URL)
 def task_output(request, object_id):
+    """Affichages de la sortie (fichiers générés) d'une tâche
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    :param object_id: Identifiant de l'objet historique de tâche à afficher
+    :type object_id: int
+    
+    :returns: HttpResponse
+    """
     
     th = get_object_or_404(TaskHistory, pk=object_id, owner=request.user)
 
@@ -283,6 +439,13 @@ taskcol = [ "joblist", "schedule", "state", "notify", ]
 
 @login_required(login_url=LOGIN_URL)
 def task_data(request):
+    """Renvoi les données nécéssaires à l'affichage du tableau (plugin dataTable) pour la liste des tâches en format JSON
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     
     try:
         iDisplayStart = int(request.GET["iDisplayStart"])
@@ -318,6 +481,13 @@ hiscol = [ "joblist", "state", "starttime", "endtime", ]
 
 @login_required(login_url=LOGIN_URL)
 def task_history_data(request):
+    """Renvoi les données nécéssaires à l'affichage du tableau (plugin dataTable) pour la liste des objets historiques de tâche en format JSON
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     
     try:
         iDisplayStart = int(request.GET["iDisplayStart"])
@@ -354,6 +524,13 @@ jobcol = [ "name", "description", "encoder", "extension", ]
 
 @login_required(login_url=LOGIN_URL)
 def job_data(request):
+    """Renvoi les données nécéssaires à l'affichage du tableau (plugin dataTable) pour la liste des jobs en format JSON
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     
     try:
         iDisplayStart = int(request.GET["iDisplayStart"])
@@ -387,6 +564,13 @@ def job_data(request):
 # Joblist specific
 @login_required(login_url=LOGIN_URL)
 def joblist_jobs_data(request, object_id):
+    """Renvoi les données nécéssaires à l'arborescence joblist (plugin jsTree) pour le contenu des jobs d'un joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     
     joblist = get_object_or_404(Joblist, pk=object_id, owner=request.user)
     json_job_list = []
@@ -408,6 +592,13 @@ def joblist_jobs_data(request, object_id):
 
 @login_required(login_url=LOGIN_URL)
 def joblist_job_detail_data(request, object_id):
+    """Renvoi les données nécéssaires à l'arborescence joblist (plugin jsTree) pour le détail d'un job contenu d'un joblist
+    
+    :param request: Paramètres de la requête HTTP
+    :type request: HttpRequest
+    
+    :returns: HttpResponse
+    """
     
     job = get_object_or_404(Job, pk=object_id, owner=request.user)
     
