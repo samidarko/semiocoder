@@ -1,0 +1,548 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>encoder.views &mdash; semiocoder 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="semiocoder 2.0 documentation" href="../index.html" />
+    <link rel="prev" title="encoder.models" href="models.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="encoder.models"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">semiocoder 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="encoder-views">
+<h1>encoder.views<a class="headerlink" href="#encoder-views" title="Permalink to this headline">¶</a></h1>
+<p>Documentation du fichier views.py de l&#8217;app encoder</p>
+<span class="target" id="module-encoder.views"></span><span class="target" id="module-views"></span><dl class="function">
+<dt id="encoder.views.job_create">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">job_create</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#job_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.job_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Création d&#8217;un objet job</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.job_data">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">job_data</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#job_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.job_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renvoi les données nécéssaires à l&#8217;affichage du tableau (plugin dataTable) pour la liste des jobs en format JSON</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.job_delete">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">job_delete</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#job_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.job_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supression d&#8217;un objet job</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet job à supprimer</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.job_detail">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">job_detail</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#job_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.job_detail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages des détails d&#8217;un objet job</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet job à afficher</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.job_list">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">job_list</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#job_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.job_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages de la liste des objets job</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.job_update">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">job_update</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#job_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.job_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mise à jour d&#8217;un objet job</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet job à mettre à jour</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_create">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_create</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Création d&#8217;un objet joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_delete">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_delete</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supression d&#8217;un objet joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet joblist à supprimer</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_detail">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_detail</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_detail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages des détails d&#8217;un objet joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet joblist à afficher</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_job_detail_data">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_job_detail_data</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_job_detail_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_job_detail_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renvoi les données nécéssaires à l&#8217;arborescence joblist (plugin jsTree) pour le détail d&#8217;un job contenu d&#8217;un joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_jobs_data">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_jobs_data</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_jobs_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_jobs_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renvoi les données nécéssaires à l&#8217;arborescence joblist (plugin jsTree) pour le contenu des jobs d&#8217;un joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_list">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_list</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages de la liste des objets joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.joblist_update">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">joblist_update</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#joblist_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.joblist_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mise à jour d&#8217;un objet joblist</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet joblist à mettre à jour</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.search">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">search</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#search"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichage du formulaire de recherche du site</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_create">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_create</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_create"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_create" title="Permalink to this definition">¶</a></dt>
+<dd><p>Création d&#8217;un objet task</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_data">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_data</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renvoi les données nécéssaires à l&#8217;affichage du tableau (plugin dataTable) pour la liste des tâches en format JSON</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_delete">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_delete</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Supression d&#8217;un objet task</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet task à supprimer</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_detail">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_detail</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_detail"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_detail" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages des détails d&#8217;un objet task</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet task à afficher</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_history">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_history</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_history"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_history" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages de l&#8217;historique des objets tâches</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_history_data">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_history_data</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_history_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_history_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Renvoi les données nécéssaires à l&#8217;affichage du tableau (plugin dataTable) pour la liste des objets historiques de tâche en format JSON</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_list">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_list</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages de la liste des objets task</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">HttpResponse</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_log">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_log</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_log"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages de la log d&#8217;une tâche</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet historique de tâche à afficher</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_output">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_output</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_output"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_output" title="Permalink to this definition">¶</a></dt>
+<dd><p>Affichages de la sortie (fichiers générés) d&#8217;une tâche</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet historique de tâche à afficher</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="encoder.views.task_update">
+<tt class="descclassname">encoder.views.</tt><tt class="descname">task_update</tt><big>(</big><em>request</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/views.html#task_update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.views.task_update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mise à jour d&#8217;un objet task</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>request</strong> (<em>HttpRequest</em>) &#8211; Paramètres de la requête HTTP</li>
+<li><strong>object_id</strong> (<em>int</em>) &#8211; Identifiant de l&#8217;objet task à mettre à jour</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HttpResponse</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="models.html"
+                        title="previous chapter">encoder.models</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/encoder/views.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="models.html" title="encoder.models"
+             >previous</a> |</li>
+        <li><a href="../index.html">semiocoder 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Samuel Darko.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

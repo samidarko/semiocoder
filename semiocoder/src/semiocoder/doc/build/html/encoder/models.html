@@ -1,0 +1,161 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>encoder.models &mdash; semiocoder 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="semiocoder 2.0 documentation" href="../index.html" />
+    <link rel="next" title="encoder.views" href="views.html" />
+    <link rel="prev" title="encoder.admin" href="libs.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="encoder.views"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="libs.html" title="encoder.admin"
+             accesskey="P">previous</a> |</li>
+        <li><a href="../index.html">semiocoder 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="encoder-models">
+<h1>encoder.models<a class="headerlink" href="#encoder-models" title="Permalink to this headline">¶</a></h1>
+<p>Documentation du fichier models.py de l&#8217;app encoder</p>
+<span class="target" id="module-encoder.models"></span><span class="target" id="module-models"></span><dl class="class">
+<dt id="encoder.models.Encoder">
+<em class="property">class </em><tt class="descclassname">encoder.models.</tt><tt class="descname">Encoder</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#Encoder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.Encoder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Encoder(id, name, path, inputflag, outputflag)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="encoder.models.Extension">
+<em class="property">class </em><tt class="descclassname">encoder.models.</tt><tt class="descname">Extension</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#Extension"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.Extension" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extension(id, name)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="encoder.models.Job">
+<em class="property">class </em><tt class="descclassname">encoder.models.</tt><tt class="descname">Job</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#Job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.Job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Job(id, name, description, owner_id, created_on, modified_on, encoder_id, options, extension_id)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="encoder.models.Joblist">
+<em class="property">class </em><tt class="descclassname">encoder.models.</tt><tt class="descname">Joblist</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#Joblist"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.Joblist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Joblist(id, name, description, owner_id, created_on, modified_on)</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="encoder.models.Task">
+<em class="property">class </em><tt class="descclassname">encoder.models.</tt><tt class="descname">Task</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#Task"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.Task" title="Permalink to this definition">¶</a></dt>
+<dd><p>Task(id, joblist_id, schedule, owner_id, state, source_file, notify)</p>
+<dl class="method">
+<dt id="encoder.models.Task.delete">
+<tt class="descname">delete</tt><big>(</big><em>using=None</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#Task.delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.Task.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Surcharge de la methode save pour supprimer le fichier source avant l objet</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="encoder.models.TaskHistory">
+<em class="property">class </em><tt class="descclassname">encoder.models.</tt><tt class="descname">TaskHistory</tt><big>(</big><em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="../_modules/encoder/models.html#TaskHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#encoder.models.TaskHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>TaskHistory(id, joblist, owner_id, state, starttime, endtime, outputdir, log)</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="libs.html"
+                        title="previous chapter">encoder.admin</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="views.html"
+                        title="next chapter">encoder.views</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/encoder/models.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="views.html" title="encoder.views"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="libs.html" title="encoder.admin"
+             >previous</a> |</li>
+        <li><a href="../index.html">semiocoder 2.0 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Samuel Darko.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

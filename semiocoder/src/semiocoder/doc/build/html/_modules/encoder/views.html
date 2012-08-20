@@ -1,0 +1,707 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>encoder.views &mdash; semiocoder 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="semiocoder 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">semiocoder 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for encoder.views</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: views</span>
+<span class="sd">   :platform: Unix, Windows</span>
+<span class="sd">   :synopsis: Module des vues de l&#39;encodeur</span>
+
+<span class="sd">.. moduleauthor:: Samuel Darko &lt;samidarko@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">Q</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
+<span class="kn">from</span> <span class="nn">django.views.generic.list_detail</span> <span class="kn">import</span> <span class="n">object_detail</span>
+<span class="kn">from</span> <span class="nn">django.core.urlresolvers</span> <span class="kn">import</span> <span class="n">reverse</span>
+<span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
+<span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Joblist</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskHistory</span>
+<span class="kn">from</span> <span class="nn">semiocoder.encoder.forms</span> <span class="kn">import</span> <span class="n">JobForm</span><span class="p">,</span> <span class="n">JoblistForm</span><span class="p">,</span> <span class="n">TaskForm</span>
+<span class="kn">from</span> <span class="nn">semiocoder.settings</span> <span class="kn">import</span> <span class="n">LOGIN_URL</span>
+<span class="kn">from</span> <span class="nn">django.template.context</span> <span class="kn">import</span> <span class="n">RequestContext</span>
+<span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">get_object_or_404</span>
+<span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
+<span class="kn">from</span> <span class="nn">django.utils.translation</span> <span class="kn">import</span> <span class="n">ugettext</span>
+<span class="kn">from</span> <span class="nn">libs</span> <span class="kn">import</span> <span class="n">getJobs</span><span class="p">,</span> <span class="n">getTasks</span><span class="p">,</span> <span class="n">getHistory</span>
+
+<span class="c"># TODO: documentation + test</span>
+<span class="c"># TODO: Ameliorer le design des formulaires et des messages d&#39;erreur</span>
+<span class="c"># TODO: Faire les tests unitaires</span>
+<span class="c"># TODO: Mettre en place les notifications / rapport joint ?</span>
+
+
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.search">[docs]</a><span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="c"># TODO: revoir les champs de recherche</span>
+    <span class="sd">&quot;&quot;&quot;Affichage du formulaire de recherche du site</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;q&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
+        <span class="n">qset</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">Q</span><span class="p">(</span><span class="n">joblist__name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">description__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">qset</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">data</span> <span class="o">=</span>  <span class="p">{</span> <span class="s">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span> <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;search.html&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+<span class="c"># Delete</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="job_delete"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.job_delete">[docs]</a><span class="k">def</span> <span class="nf">job_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Supression d&#39;un objet job</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet job à supprimer</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Job</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">}</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;jobs&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Job delete confirmation&#39;</span><span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_delete"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_delete">[docs]</a><span class="k">def</span> <span class="nf">joblist_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Supression d&#39;un objet joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet joblist à supprimer</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Joblist</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">}</span>
+        <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;joblists&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Joblist delete confirmation&#39;</span><span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_delete"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_delete">[docs]</a><span class="k">def</span> <span class="nf">task_delete</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Supression d&#39;un objet task</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet task à supprimer</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s">&#39;W&#39;</span><span class="p">:</span>
+            <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;The </span><span class="si">%(verbose_name)s</span><span class="s"> can not be deleted because state is already &quot;Pending&quot; or &quot;Running&quot;.&#39;</span>  <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;tasks&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Task delete confirmation&#39;</span><span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+<span class="c"># Update</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="job_update"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.job_update">[docs]</a><span class="k">def</span> <span class="nf">job_update</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mise à jour d&#39;un objet job</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet job à mettre à jour</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Job</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span><span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">,</span> <span class="s">&#39;action&#39;</span> <span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;job_edit&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span> <span class="n">object_id</span><span class="p">,]),</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Job edit&#39;</span><span class="p">,</span> <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JobForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was updated successfully.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;element&quot;</span><span class="p">],</span> <span class="p">}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;jobs&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JobForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_update"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_update">[docs]</a><span class="k">def</span> <span class="nf">joblist_update</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mise à jour d&#39;un objet joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet joblist à mettre à jour</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Joblist</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span><span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">,</span> <span class="s">&#39;action&#39;</span> <span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;joblist_edit&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span> <span class="n">object_id</span><span class="p">,]),</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Joblist edit&#39;</span><span class="p">,</span> <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JoblistForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was updated successfully.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;element&quot;</span><span class="p">],</span> <span class="p">}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;joblists&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JoblistForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    </div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_update"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_update">[docs]</a><span class="k">def</span> <span class="nf">task_update</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Mise à jour d&#39;un objet task</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet task à mettre à jour</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span><span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">,</span> <span class="s">&#39;action&#39;</span> <span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;task_edit&#39;</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="p">[</span> <span class="n">object_id</span><span class="p">,]),</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Task edit&#39;</span><span class="p">,</span> <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TaskForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">obj</span> <span class="o">=</span> <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was updated successfully.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&quot;element&quot;</span><span class="p">],</span> <span class="p">}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;tasks&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TaskForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+    
+<span class="c"># Create</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="job_create"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.job_create">[docs]</a><span class="k">def</span> <span class="nf">job_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Création d&#39;un objet job</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&quot;Ajout d&#39;un job&quot;</span><span class="p">,</span> <span class="s">&#39;action&#39;</span> <span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;job_add&#39;</span><span class="p">),</span> <span class="p">}</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JobForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was created successfully.&quot;</span><span class="p">)</span>  <span class="o">%</span> <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;element&#39;</span><span class="p">]}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;jobs&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JobForm</span><span class="p">()</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_create"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_create">[docs]</a><span class="k">def</span> <span class="nf">joblist_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Création d&#39;un objet joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&quot;Ajout d&#39;une joblist&quot;</span><span class="p">,</span> <span class="s">&#39;action&#39;</span> <span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;joblist_add&#39;</span><span class="p">),</span> <span class="p">}</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JoblistForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">Joblist</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was created successfully.&quot;</span><span class="p">)</span>  <span class="o">%</span> <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;element&#39;</span><span class="p">]}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;joblists&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">JoblistForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_create"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_create">[docs]</a><span class="k">def</span> <span class="nf">task_create</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Création d&#39;un objet task</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&quot;Ajout d&#39;une tache&quot;</span><span class="p">,</span> <span class="s">&#39;action&#39;</span> <span class="p">:</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;task_add&#39;</span><span class="p">),</span> <span class="p">}</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TaskForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">FILES</span><span class="p">,</span> <span class="n">instance</span> <span class="o">=</span> <span class="n">Task</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was created successfully.&quot;</span><span class="p">)</span> <span class="o">%</span> <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">[</span><span class="s">&#39;element&#39;</span><span class="p">]}</span>
+            <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;tasks&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">TaskForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+
+<span class="c"># Object detail</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="job_detail"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.job_detail">[docs]</a><span class="k">def</span> <span class="nf">job_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages des détails d&#39;un objet job</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet job à afficher</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span><span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">,</span> <span class="s">&#39;id&#39;</span> <span class="p">:</span> <span class="n">object_id</span><span class="p">,</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">object_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">Job</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span> <span class="n">object_id</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&quot;encoder/job_detail.html&quot;</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_detail"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_detail">[docs]</a><span class="k">def</span> <span class="nf">joblist_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages des détails d&#39;un objet joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet joblist à afficher</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span><span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">,</span> <span class="s">&#39;id&#39;</span> <span class="p">:</span> <span class="n">object_id</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Detail du joblist&#39;</span><span class="p">,</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">object_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">Joblist</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span> <span class="n">object_id</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&quot;encoder/joblist_detail.html&quot;</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    
+    </div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_detail"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_detail">[docs]</a><span class="k">def</span> <span class="nf">task_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages des détails d&#39;un objet task</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet task à afficher</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span><span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">,</span> <span class="s">&#39;id&#39;</span> <span class="p">:</span> <span class="n">object_id</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Detail du task&#39;</span><span class="p">,</span> <span class="p">}</span>
+    <span class="k">return</span> <span class="n">object_detail</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span> <span class="n">object_id</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">template_name</span><span class="o">=</span><span class="s">&quot;encoder/task_detail.html&quot;</span><span class="p">,</span> <span class="n">extra_context</span><span class="o">=</span><span class="n">data</span><span class="p">)</span>
+    
+<span class="c"># Object list</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="job_list"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.job_list">[docs]</a><span class="k">def</span> <span class="nf">job_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages de la liste des objets job</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;encoder/job.html&quot;</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_list"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_list">[docs]</a><span class="k">def</span> <span class="nf">joblist_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="c"># TODO: ajouter le champ de recherche jstree + bouton pour fermer tous les noeuds</span>
+    <span class="sd">&quot;&quot;&quot;Affichages de la liste des objets joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;encoder/joblist.html&quot;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;joblist_list&#39;</span> <span class="p">:</span> <span class="n">Joblist</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span> <span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_list"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_list">[docs]</a><span class="k">def</span> <span class="nf">task_list</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages de la liste des objets task</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;encoder/task.html&quot;</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+<span class="c"># Task specific</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_history"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_history">[docs]</a><span class="k">def</span> <span class="nf">task_history</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages de l&#39;historique des objets tâches</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;encoder/task_history.html&quot;</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_log"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_log">[docs]</a><span class="k">def</span> <span class="nf">task_log</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages de la log d&#39;une tâche</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet historique de tâche à afficher</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/task_log.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;th&#39;</span> <span class="p">:</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">TaskHistory</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span> <span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_output"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_output">[docs]</a><span class="k">def</span> <span class="nf">task_output</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichages de la sortie (fichiers générés) d&#39;une tâche</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    :param object_id: Identifiant de l&#39;objet historique de tâche à afficher</span>
+<span class="sd">    :type object_id: int</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">th</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">TaskHistory</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;media/videos/&#39;</span><span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;task_history&#39;</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="n">selectedfiles</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s">&#39;outputfiles&#39;</span><span class="p">)</span> 
+        <span class="c"># On supprime les fichiers selectionnes</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">selectedfiles</span><span class="p">:</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;fichier </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">}</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="s">&#39;impossible to delete </span><span class="si">%s</span><span class="s"> &#39;</span> <span class="o">%</span> <span class="n">filename</span>
+                <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="c"># si il n y a plus de fichiers on supprime le repertoire</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selectedfiles</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s">&#39;media/videos/&#39;</span><span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;task_history&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;task_output&#39;</span><span class="p">,</span> <span class="n">object_id</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        
+        <span class="n">data</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&#39;files&#39;</span><span class="p">:</span> <span class="n">files</span><span class="p">,</span> <span class="s">&#39;th&#39;</span><span class="p">:</span> <span class="n">th</span><span class="p">,</span> <span class="s">&#39;outputfiles&#39;</span> <span class="p">:</span> <span class="n">files</span> <span class="p">}</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/output_files.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+
+</div>
+<span class="n">taskcol</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;joblist&quot;</span><span class="p">,</span> <span class="s">&quot;schedule&quot;</span><span class="p">,</span> <span class="s">&quot;state&quot;</span><span class="p">,</span> <span class="s">&quot;notify&quot;</span><span class="p">,</span> <span class="p">]</span>
+
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_data"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_data">[docs]</a><span class="k">def</span> <span class="nf">task_data</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Renvoi les données nécéssaires à l&#39;affichage du tableau (plugin dataTable) pour la liste des tâches en format JSON</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iDisplayStart</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iDisplayStart&quot;</span><span class="p">])</span>
+        <span class="n">iDisplayLength</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iDisplayLength&quot;</span><span class="p">])</span>
+        <span class="n">sSearch</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sSearch&quot;</span><span class="p">]</span>
+        <span class="n">sEcho</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sEcho&quot;</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iSortCol_0&quot;</span><span class="p">])</span>
+            <span class="n">ascending</span> <span class="o">=</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sSortDir_0&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;asc&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">ascending</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">total_tasks</span><span class="p">,</span> <span class="n">filtered_tasks</span><span class="p">,</span> <span class="n">tasks</span> <span class="o">=</span> <span class="n">getTasks</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">first_id</span><span class="o">=</span><span class="n">iDisplayStart</span><span class="p">,</span> 
+                         <span class="n">last_id</span><span class="o">=</span><span class="n">iDisplayStart</span> <span class="o">+</span> <span class="n">iDisplayLength</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                         <span class="n">search_str</span><span class="o">=</span><span class="n">sSearch</span><span class="p">,</span>
+                         <span class="n">sort_by</span><span class="o">=</span><span class="n">taskcol</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> 
+                         <span class="n">asc</span><span class="o">=</span><span class="n">ascending</span><span class="p">)</span>
+
+    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;sEcho&quot;</span> <span class="p">:</span> <span class="n">sEcho</span><span class="p">,</span>
+        <span class="s">&quot;iTotalRecords&quot;</span> <span class="p">:</span> <span class="n">total_tasks</span><span class="p">,</span>
+        <span class="s">&quot;iTotalDisplayRecords&quot;</span> <span class="p">:</span> <span class="n">filtered_tasks</span><span class="p">,</span>
+        <span class="s">&quot;aaData&quot;</span> <span class="p">:</span> <span class="n">tasks</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_data</span><span class="p">))</span>
+
+</div>
+<span class="n">hiscol</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;joblist&quot;</span><span class="p">,</span> <span class="s">&quot;state&quot;</span><span class="p">,</span> <span class="s">&quot;starttime&quot;</span><span class="p">,</span> <span class="s">&quot;endtime&quot;</span><span class="p">,</span> <span class="p">]</span>
+
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="task_history_data"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_history_data">[docs]</a><span class="k">def</span> <span class="nf">task_history_data</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Renvoi les données nécéssaires à l&#39;affichage du tableau (plugin dataTable) pour la liste des objets historiques de tâche en format JSON</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iDisplayStart</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iDisplayStart&quot;</span><span class="p">])</span>
+        <span class="n">iDisplayLength</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iDisplayLength&quot;</span><span class="p">])</span>
+        <span class="n">sSearch</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sSearch&quot;</span><span class="p">]</span>
+        <span class="n">sEcho</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sEcho&quot;</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iSortCol_0&quot;</span><span class="p">])</span>
+            <span class="n">ascending</span> <span class="o">=</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sSortDir_0&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;asc&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">ascending</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">total_tasks</span><span class="p">,</span> <span class="n">filtered_tasks</span><span class="p">,</span> <span class="n">tasks</span> <span class="o">=</span> <span class="n">getHistory</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">first_id</span><span class="o">=</span><span class="n">iDisplayStart</span><span class="p">,</span> 
+                         <span class="n">last_id</span><span class="o">=</span><span class="n">iDisplayStart</span> <span class="o">+</span> <span class="n">iDisplayLength</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                         <span class="n">search_str</span><span class="o">=</span><span class="n">sSearch</span><span class="p">,</span>
+                         <span class="n">sort_by</span><span class="o">=</span><span class="n">hiscol</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> 
+                         <span class="n">asc</span><span class="o">=</span><span class="n">ascending</span><span class="p">)</span>
+
+    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;sEcho&quot;</span> <span class="p">:</span> <span class="n">sEcho</span><span class="p">,</span>
+        <span class="s">&quot;iTotalRecords&quot;</span> <span class="p">:</span> <span class="n">total_tasks</span><span class="p">,</span>
+        <span class="s">&quot;iTotalDisplayRecords&quot;</span> <span class="p">:</span> <span class="n">filtered_tasks</span><span class="p">,</span>
+        <span class="s">&quot;aaData&quot;</span> <span class="p">:</span> <span class="n">tasks</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_data</span><span class="p">))</span>
+
+<span class="c"># Job specific</span>
+</div>
+<span class="n">jobcol</span> <span class="o">=</span> <span class="p">[</span> <span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="s">&quot;description&quot;</span><span class="p">,</span> <span class="s">&quot;encoder&quot;</span><span class="p">,</span> <span class="s">&quot;extension&quot;</span><span class="p">,</span> <span class="p">]</span>
+
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="job_data"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.job_data">[docs]</a><span class="k">def</span> <span class="nf">job_data</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Renvoi les données nécéssaires à l&#39;affichage du tableau (plugin dataTable) pour la liste des jobs en format JSON</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">iDisplayStart</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iDisplayStart&quot;</span><span class="p">])</span>
+        <span class="n">iDisplayLength</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iDisplayLength&quot;</span><span class="p">])</span>
+        <span class="n">sSearch</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sSearch&quot;</span><span class="p">]</span>
+        <span class="n">sEcho</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sEcho&quot;</span><span class="p">])</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;iSortCol_0&quot;</span><span class="p">])</span>
+            <span class="n">ascending</span> <span class="o">=</span> <span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="p">[</span><span class="s">&quot;sSortDir_0&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s">&quot;asc&quot;</span><span class="p">)</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">column</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">ascending</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="n">total_jobs</span><span class="p">,</span> <span class="n">filtered_jobs</span><span class="p">,</span> <span class="n">jobs</span> <span class="o">=</span> <span class="n">getJobs</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">first_id</span><span class="o">=</span><span class="n">iDisplayStart</span><span class="p">,</span> 
+                         <span class="n">last_id</span><span class="o">=</span><span class="n">iDisplayStart</span> <span class="o">+</span> <span class="n">iDisplayLength</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span>
+                         <span class="n">search_str</span><span class="o">=</span><span class="n">sSearch</span><span class="p">,</span>
+                         <span class="n">sort_by</span><span class="o">=</span><span class="n">jobcol</span><span class="p">[</span><span class="n">column</span><span class="p">],</span> 
+                         <span class="n">asc</span><span class="o">=</span><span class="n">ascending</span><span class="p">)</span>
+
+    <span class="n">json_data</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s">&quot;sEcho&quot;</span> <span class="p">:</span> <span class="n">sEcho</span><span class="p">,</span>
+        <span class="s">&quot;iTotalRecords&quot;</span> <span class="p">:</span> <span class="n">total_jobs</span><span class="p">,</span>
+        <span class="s">&quot;iTotalDisplayRecords&quot;</span> <span class="p">:</span> <span class="n">filtered_jobs</span><span class="p">,</span>
+        <span class="s">&quot;aaData&quot;</span> <span class="p">:</span> <span class="n">jobs</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_data</span><span class="p">))</span>
+
+<span class="c"># Joblist specific</span></div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_jobs_data"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_jobs_data">[docs]</a><span class="k">def</span> <span class="nf">joblist_jobs_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Renvoi les données nécéssaires à l&#39;arborescence joblist (plugin jsTree) pour le contenu des jobs d&#39;un joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">joblist</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Joblist</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    <span class="n">json_job_list</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">if</span> <span class="n">joblist</span><span class="o">.</span><span class="n">owner</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">joblist</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">select_related</span><span class="p">():</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">Id</span> <span class="o">=</span> <span class="s">&quot;_</span><span class="si">%d</span><span class="s">_</span><span class="si">%d</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">object_id</span><span class="p">),</span> <span class="n">j</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="n">url</span> <span class="o">=</span> <span class="n">reverse</span><span class="p">(</span><span class="s">&#39;job_detail&#39;</span><span class="p">,</span> <span class="n">args</span> <span class="o">=</span> <span class="p">[</span> <span class="n">j</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="p">])</span>
+            <span class="n">title</span> <span class="o">=</span> <span class="s">&#39;&lt;b&gt;</span><span class="si">%s</span><span class="s">&lt;/b&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">j</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">job</span><span class="p">[</span><span class="s">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;title&quot;</span> <span class="p">:</span> <span class="n">title</span><span class="p">,</span> <span class="s">&quot;attr&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&quot;href&quot;</span> <span class="p">:</span> <span class="n">url</span> <span class="p">}</span> <span class="p">}</span>
+            <span class="n">job</span><span class="p">[</span><span class="s">&quot;attr&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span> <span class="s">&quot;id&quot;</span> <span class="p">:</span> <span class="n">Id</span> <span class="p">,</span> <span class="s">&quot;rel&quot;</span> <span class="p">:</span> <span class="s">&quot;job&quot;</span> <span class="p">,</span> <span class="p">}</span>
+            <span class="n">job</span><span class="p">[</span><span class="s">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s">&quot;closed&quot;</span>
+            <span class="n">json_job_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_job_list</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_job_list</span><span class="p">))</span>
+
+</div>
+<span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
+<div class="viewcode-block" id="joblist_job_detail_data"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.joblist_job_detail_data">[docs]</a><span class="k">def</span> <span class="nf">joblist_job_detail_data</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Renvoi les données nécéssaires à l&#39;arborescence joblist (plugin jsTree) pour le détail d&#39;un job contenu d&#39;un joblist</span>
+<span class="sd">    </span>
+<span class="sd">    :param request: Paramètres de la requête HTTP</span>
+<span class="sd">    :type request: HttpRequest</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: HttpResponse</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">job</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Job</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+    
+    <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">owner</span> <span class="o">==</span> <span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">:</span>
+        <span class="n">json_job_detail</span> <span class="o">=</span> <span class="p">[</span>
+                        <span class="p">{</span> <span class="s">&#39;data&#39;</span> <span class="p">:</span> <span class="s">&#39;&lt;b&gt;encodeur&lt;/b&gt; : &lt;i&gt;</span><span class="si">%s</span><span class="s">&lt;/i&gt;&#39;</span> <span class="o">%</span> <span class="n">job</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;attr&#39;</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&quot;rel&quot;</span> <span class="p">:</span> <span class="s">&quot;job_detail&quot;</span> <span class="p">,</span> <span class="p">},</span> <span class="s">&#39;state&#39;</span> <span class="p">:</span> <span class="s">&#39;closed&#39;</span><span class="p">,</span> <span class="p">},</span>
+                        <span class="p">{</span> <span class="s">&#39;data&#39;</span> <span class="p">:</span> <span class="s">&#39;&lt;b&gt;extension&lt;/b&gt; : &lt;i&gt;</span><span class="si">%s</span><span class="s">&lt;/i&gt;&#39;</span> <span class="o">%</span> <span class="n">job</span><span class="o">.</span><span class="n">extension</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s">&#39;attr&#39;</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&quot;rel&quot;</span> <span class="p">:</span> <span class="s">&quot;job_detail&quot;</span> <span class="p">,</span> <span class="p">},</span> <span class="s">&#39;state&#39;</span> <span class="p">:</span> <span class="s">&#39;closed&#39;</span><span class="p">,</span> <span class="p">},</span>
+                        <span class="p">{</span> <span class="s">&#39;data&#39;</span> <span class="p">:</span> <span class="s">&#39;&lt;b&gt;options&lt;/b&gt; : &lt;i&gt;</span><span class="si">%s</span><span class="s">&lt;/i&gt;&#39;</span> <span class="o">%</span> <span class="n">job</span><span class="o">.</span><span class="n">options</span><span class="p">,</span> <span class="s">&#39;attr&#39;</span> <span class="p">:</span> <span class="p">{</span> <span class="s">&quot;rel&quot;</span> <span class="p">:</span> <span class="s">&quot;job_detail&quot;</span> <span class="p">,</span> <span class="p">},</span> <span class="s">&#39;state&#39;</span> <span class="p">:</span> <span class="s">&#39;closed&#39;</span><span class="p">,</span> <span class="p">},</span>
+                        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">json_job_detail</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">HttpResponse</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">([]))</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">semiocoder 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Samuel Darko.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

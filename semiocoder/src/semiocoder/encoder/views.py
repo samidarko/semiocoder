@@ -22,7 +22,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext
 from libs import getJobs, getTasks, getHistory
 
-# TODO: documentation + test
+# TODO: doctest
 # TODO: Ameliorer le design des formulaires et des messages d'erreur
 # TODO: Faire les tests unitaires
 # TODO: Mettre en place les notifications / rapport joint ?

@@ -1,0 +1,190 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>core.tasks &mdash; semiocoder 2.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="semiocoder 2.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">semiocoder 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for core.tasks</h1><div class="highlight"><pre>
+<span class="c"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">.. module:: tasks</span>
+<span class="sd">   :platform: Unix, Windows</span>
+<span class="sd">   :synopsis: Taches planifiées et asynchrones nécéssaires au fonctionnement interne de l&#39;application encoder basé sur Celery</span>
+
+<span class="sd">.. moduleauthor:: Samuel Darko &lt;samidarko@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">subprocess</span><span class="o">,</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">celery</span> <span class="kn">import</span> <span class="n">task</span>
+<span class="kn">from</span> <span class="nn">celery.task</span> <span class="kn">import</span> <span class="n">periodic_task</span>
+<span class="kn">from</span> <span class="nn">celery.task.schedules</span> <span class="kn">import</span> <span class="n">crontab</span>
+<span class="kn">from</span> <span class="nn">semiocoder.encoder.models</span> <span class="kn">import</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskHistory</span>
+
+<span class="c"># TODO: verifier que le binaire est bien appelé depuis exe</span>
+<span class="c"># TODO: tester avec libav</span>
+
+
+<div class="viewcode-block" id="taskLaucher"><a class="viewcode-back" href="../../core/tasks.html#core.tasks.taskLaucher">[docs]</a><span class="k">def</span> <span class="nf">taskLaucher</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Affichage du formulaire de recherche du site</span>
+<span class="sd">    </span>
+<span class="sd">    :param t: objet Task</span>
+<span class="sd">    :type t: Task</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: int</span>
+<span class="sd">        The return code::</span>
+<span class="sd">            0 -- Success!</span>
+<span class="sd">            1 -- No good.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s">&#39;R&#39;</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    <span class="n">th</span> <span class="o">=</span> <span class="n">TaskHistory</span><span class="p">(</span><span class="n">joblist</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">joblist</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">owner</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">owner</span><span class="p">,</span> <span class="n">starttime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span> <span class="n">outputdir</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">source_file</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)[</span><span class="mi">3</span><span class="p">])</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="s">&quot;&quot;</span><span class="p">;</span> <span class="n">ret</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">joblist</span><span class="o">.</span><span class="n">job</span><span class="o">.</span><span class="n">select_related</span><span class="p">():</span>
+        <span class="c"># Creation de la log</span>
+        <span class="n">log</span> <span class="o">+=</span> <span class="s">&quot;===== Log </span><span class="si">%s</span><span class="s"> =============================</span><span class="se">\n\n</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        
+        <span class="c"># Preparation des params pour subprocess</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span> <span class="n">job</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="p">]</span>                                                    <span class="c"># encodeur</span>
+        <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">inputflag</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">inputflag</span><span class="p">)</span>                    <span class="c"># option du fichier en entree</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">source_file</span><span class="o">.</span><span class="n">url</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>                                              <span class="c"># le chemin du fichier en entree</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">split</span><span class="p">())</span>                                                <span class="c"># les options specifiees dans le job        </span>
+        <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">outputflag</span><span class="p">:</span> <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">outputflag</span><span class="p">)</span>                  <span class="c"># option du fichier en sortie</span>
+        <span class="n">output_filename</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&quot;%H%M%S&quot;</span><span class="p">)</span><span class="o">+</span><span class="s">&#39;-&#39;</span><span class="o">+</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">source_file</span><span class="o">.</span><span class="n">url</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">+</span><span class="s">&#39;-&#39;</span><span class="o">+</span><span class="n">job</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s">&#39;.&#39;</span><span class="o">+</span><span class="n">job</span><span class="o">.</span><span class="n">extension</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">source_file</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;/&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">+</span><span class="p">[</span> <span class="n">output_filename</span><span class="p">,</span> <span class="p">]))</span>   <span class="c"># chemin du fichier en sortie</span>
+        
+        <span class="c"># Execution</span>
+        <span class="n">cmdp</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">cmdout</span><span class="p">,</span><span class="n">cmderr</span> <span class="o">=</span>  <span class="n">cmdp</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="n">ret</span> <span class="o">+=</span> <span class="n">cmdp</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="n">log</span> <span class="o">+=</span> <span class="n">cmdout</span>
+        <span class="k">if</span> <span class="n">cmderr</span><span class="p">:</span> <span class="n">log</span> <span class="o">+=</span> <span class="s">&quot;&lt;p&gt;&lt;FONT COLOR=RED&gt;Error log :</span><span class="se">\n</span><span class="s">&quot;</span> <span class="o">+</span> <span class="n">cmderr</span> <span class="o">+</span> <span class="s">&quot;&lt;/FONT&gt;&lt;/p&gt;&quot;</span>
+        <span class="n">log</span> <span class="o">+=</span> <span class="s">&#39;</span><span class="se">\n\n</span><span class="s">&#39;</span>
+        
+    <span class="k">if</span> <span class="n">ret</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s">&quot;C&quot;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">th</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s">&quot;F&quot;</span>
+        
+    <span class="n">th</span><span class="o">.</span><span class="n">log</span> <span class="o">=</span> <span class="n">log</span>
+    <span class="n">th</span><span class="o">.</span><span class="n">endtime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+    <span class="n">th</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+    
+    <span class="c"># notification</span>
+<span class="c">#    if t.notify:</span>
+<span class="c">#        notify(level=t.notify, history=th.id)</span>
+        
+    <span class="c"># suppression de la tache</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
+    
+    <span class="k">return</span> <span class="n">ret</span>
+        
+        
+        
+</div>
+<span class="nd">@periodic_task</span><span class="p">(</span><span class="n">run_every</span><span class="o">=</span><span class="n">crontab</span><span class="p">(</span><span class="n">minute</span><span class="o">=</span><span class="s">&quot;*/5&quot;</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">taskScheduler</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Tache périodique qui vérifie si tache planifiée doit être démarrée.</span>
+<span class="sd">    Si c&#39;est le cas son statut change de &quot;waiting&quot; à &quot;pending&quot;.</span>
+<span class="sd">    </span>
+<span class="sd">    :returns: int (le nombre de taches démarrées)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="n">tasks</span> <span class="o">=</span> <span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">schedule__lte</span><span class="o">=</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">())</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="s">&#39;schedule&#39;</span><span class="p">)</span>
+    <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s">&#39;W&#39;</span><span class="p">:</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">state</span> <span class="o">=</span> <span class="s">&#39;P&#39;</span>
+            <span class="n">t</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+            <span class="n">taskLaucher</span><span class="o">.</span><span class="n">delay</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+            <span class="n">counter</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">return</span> <span class="n">counter</span>
+
+    
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">semiocoder 2.0 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2012, Samuel Darko.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
