@@ -106,8 +106,8 @@ def getTasks(user, first_id, last_id, search_str=None, sort_by="name", asc=True)
                 t.schedule.strftime('%Y-%m-%d %H:%M:%S'),
                 state,
                 notify,
-                '<a href=%s><img src=%simages/edit.png></a>' % (reverse('task_edit', args = [ t.id, ]), STATIC_URL),
-                '<a href=%s><img src=%simages/delete.png></a>' % (reverse('task_delete', args = [ t.id, ],), STATIC_URL),
+                '<a href=%s><img src=%simg/edit.png></a>' % (reverse('task_edit', args = [ t.id, ]), STATIC_URL),
+                '<a href=%s><img src=%simg/delete.png></a>' % (reverse('task_delete', args = [ t.id, ],), STATIC_URL),
              ]
         tasks_list.append(task)
     return total_tasks, filtered_tasks, tasks_list

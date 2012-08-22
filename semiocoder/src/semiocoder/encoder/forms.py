@@ -59,7 +59,8 @@ class TaskForm(forms.ModelForm):
         super(TaskForm, self).__init__(*args, **kwargs)
         self.fields['joblist'] = forms.ModelChoiceField(Joblist.objects.filter(owner=user), label='Joblists * ') # On filtre le queryset par utilisateur
         self.fields['schedule'] = forms.DateTimeField(initial=(datetime.now()+timedelta(minutes=10)).strftime('%d/%m/%Y %H:%M'), label='Planification * ')
-        self.fields['source_file'] = forms.FileField(label='Fichier source * ', help_text="(fichier à encoder)")
+        self.fields['source_file'] = forms.FileField(label='Fichier source * ',)
+        self.fields['notify'] = forms.BooleanField(label='Notification',help_text=' - Cocher pour activer')
 
     class Meta:
         model = Task

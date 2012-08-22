@@ -23,9 +23,10 @@ from django.utils.translation import ugettext
 from libs import getJobs, getTasks, getHistory
 
 # TODO: doctest
-# TODO: Ameliorer le design des formulaires et des messages d'erreur
+# TODO: Ameliorer les pages detail (commencer par task)
 # TODO: Faire les tests unitaires
 # TODO: Mettre en place les notifications / rapport joint ?
+# TODO: Ajout des logos
 
 
 @login_required(login_url=LOGIN_URL)
@@ -37,7 +38,7 @@ def search(request): # TODO: revoir les champs de recherche
     
     :returns: HttpResponse
     """
-    query = request.GET.get('q', '')
+    query = request.POST.get('q', '')
     if query:
         qset = (
             Q(joblist__name__icontains=query) | Q(description__icontains=query)

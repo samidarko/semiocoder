@@ -32,7 +32,7 @@
 	            "types" : {
 	                "joblist" : {
                 		"icon" : {
-	                			"image" : '/static/images/joblist.png',
+	                			"image" : '/static/img/joblist.png',
 	                		},
 	                    "class" : "joblist-row",
 	                    "valid_children" : [ "job" ],
@@ -42,7 +42,7 @@
 	                },
 	                "job" : {
 	                	"icon" : {
-                			"image" : '/static/images/job.png',
+                			"image" : '/static/img/job.png',
                 		},
 	                    "valid_children" : [ "job_detail" ],
 	                    "max_depth" : 3,
@@ -51,7 +51,7 @@
 	                },
 	                "job_detail" : {
 	                	"icon" : {
-                			"image" : '/static/images/settings.gif',
+                			"image" : '/static/img/settings.gif',
                 		},
 	                    "valid_children" : "none",
 	                    "max_depth" : 0,
@@ -91,7 +91,7 @@
 {% block content %}
 
 <div class="box">
-	<h2>Mes joblists</h2>
+	<h2 class="title">Mes joblists</h2>
 	<div class="addLink"><a href="{% url joblist_add %}" title="">Ajouter une joblist</a></div>
 	<div id="joblist_tree"></div>
 

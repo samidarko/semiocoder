@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validate.js"></script>
 	<script type="text/javascript">    
 	    jQuery(document).ready(function() {
-	    	   jQuery("#myform").validate({
+	    	   jQuery("#start").validate({
 	    	      rules: {
 	    	         "name":{
 	    	            "required": true,
@@ -39,7 +39,8 @@
 		    	     "source_file":{
 			    	    "required": true,
 		    	     },
-	    	      }
+	    	      },
+	    	      errorElement: "div",
 	    	  })
 	    	});
 	    jQuery.extend(jQuery.validator.messages, {
@@ -64,20 +65,29 @@
 {% block content %}
 
 	<div class="box">
-		<h2>{{ title }}</h2>
-		<div class="addLink"><span>* Champs requis</span></div>
-		{% if form.is_multipart %}
-		    <form enctype="multipart/form-data" id="myform" action="{{ action }}" method="post">
-		{% else %}
-		    <form id="myform" action="{{ action }}" method="post">
-		{% endif %}
+	<h2 class="title">{{ title }}</h2>
+	{% if form.is_multipart %}
+    	<form enctype="multipart/form-data" id="start" action="{{ action }}" method="post">
+	{% else %}
+	    <form id="start" action="{{ action }}" method="post">
+	{% endif %}
+		<h1>{{ title }}</h1>
+		
+		{% csrf_token %}
 
-				{% csrf_token %}
+		{% for field in form %}
+        <p>
+            
+            {{ field.label_tag }} {{ field }} {{ field.help_text }}
+            <div>{{ field.errors.0 }}</div>
+        </p>
+    	{% endfor %}
 
-				{{ form.as_p }}
-				
-				<input type="submit" value="Envoyer" />
-			</form>
+		<p>
+			<input type="submit" value="Envoyer" /> ou <a href=".">annuler</a>
+		</p>
+	</form>
+		
 	</div>
 	
 {% endblock %}

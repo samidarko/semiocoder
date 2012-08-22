@@ -5,7 +5,7 @@
 {% block content %}
 
 	<div class="box">
-		<h2>Detail de la tache : {{ object.joblist.name }}</h2>
+		<h2 class="title">Detail de la tache : {{ object.joblist.name }}</h2>
 
 		<ul>
 		    <li>Planification : {{ object.schedule }}</li>
@@ -21,7 +21,9 @@
 		</ul>
 
 		{% if object.state == 'W' %}
-		<a href="{% url task_edit id %}">Editer</a>&nbsp;-&nbsp;<a href="{% url task_delete id %}">Supprimer</a>
+		<p>
+		<a class="submit" href="{% url task_edit id %}">Editer</a><a class="submit" href="{% url task_delete id %}">Supprimer</a>
+		</p>
 		{% endif %}
 	</div>
 

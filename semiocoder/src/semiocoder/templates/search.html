@@ -4,12 +4,17 @@
 
 {% block content %}
 	<div class="box">
-		<h2>Rechercher</h2>
-        <form action="." method="GET">
-            <label for="q">Mots clés : </label>
-            <input type="text" name="q" value="{{ query|escape }}">
-            <input type="submit" value="Rechercher">
+		<h2 class="title">Rechercher</h2>
+        <form id="start"  action="." method="POST">
+        	<p>
+	            <label for="q">Mots clés : </label>
+	            <input type="text" name="q" value="{{ query|escape }}">
+	        </p>
+            <p>
+            	<input type="submit" value="Rechercher">
+            </p>
         </form>
+        
           {% if query %}
               <h2>Results for "{{ query|escape }}":</h2>
                 {% if results %}
@@ -22,5 +27,6 @@
                   <p>Aucun résultat trouvé</p>
                 {% endif %}
           {% endif %}
+          
 	</div>
 {% endblock %}

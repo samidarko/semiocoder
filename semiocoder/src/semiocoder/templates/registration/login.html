@@ -2,28 +2,45 @@
 
 {% block title %}Page de connexion{% endblock %}
 
+{% block scripts %}
+	
+	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validate.js"></script>
+	<script type="text/javascript">    
+	    jQuery(document).ready(function() {
+	    	   jQuery("#start").validate({
+	    	      rules: {
+	    	         "username":{
+	    	            "required": true,
+	    	         },
+	    	         "password":{
+		    	     	"required": true,
+		    	     },
+	    	      },
+	    	      errorElement: "div",
+	    	  })
+	    	});
+	    jQuery.extend(jQuery.validator.messages, {
+	    	required: "ce champs est requis",
+	    });
+    </script>
+	
+{% endblock %}
+
 {% block content %}
 
 	<div class="box">
-		<h2>Page de connexion</h2>
 		
-		<form method="post" action="{% url django.contrib.auth.views.login %}">
-		  {% csrf_token %}
+		<form method="post" id="start" action="{% url django.contrib.auth.views.login %}">
+		
+			<h1>Connexion</h1>
 		  
-			<table>
-			<tr>
-				
-			    <td>{{ form.username.label_tag }}</td>
-			    <td>{{ form.username }}</td>
-			    {% if form.username.errors %}<td>&nbsp;&nbsp;({{ form.username.errors.0 }})</td>{% endif %}
-			</tr>
-			<tr>
-				
-			    <td>{{ form.password.label_tag }}</td>
-			    <td>{{ form.password }}</td>
-			     {% if form.password.errors %}<td>&nbsp;&nbsp;({{ form.password.errors.0 }})</td>{% endif %}
-			</tr>
-			</table>
+		  	{% csrf_token %}
+		  	
+		  	<p><label for="id_username">Identifiant:</label> {{ form.username }}<div>{{ form.username.errors.0 }}</div></p>
+		  	
+		  	<p><label for="id_password">Mot de passe:</label>{{ form.password }}<div>{{ form.password.errors.0 }}</div></p>
+		  	
+			
 			<input type="hidden" name="next" value="{{ next }}" />
 			<input type="submit" value="login" />
 		</form>

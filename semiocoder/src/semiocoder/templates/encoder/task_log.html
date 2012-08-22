@@ -5,7 +5,7 @@
 {% block content %}
 
 	<div class="box">
-		<h2>Log for {{ th.joblist }}</h2>
+		<h2 class="title">Log for {{ th.joblist }}</h2>
 		{% autoescape off %}
 			{{ th.log|linebreaksbr }}
 		{% endautoescape %}
