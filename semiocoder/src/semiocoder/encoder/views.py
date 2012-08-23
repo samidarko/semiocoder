@@ -26,7 +26,6 @@ from libs import getJobs, getTasks, getHistory
 # TODO: Ameliorer les pages detail (commencer par task)
 # TODO: Faire les tests unitaires
 # TODO: Mettre en place les notifications / rapport joint ?
-# TODO: Ajout des logos
 
 
 @login_required(login_url=LOGIN_URL)
