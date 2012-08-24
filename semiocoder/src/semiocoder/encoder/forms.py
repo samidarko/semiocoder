@@ -7,9 +7,38 @@
 .. moduleauthor:: Samuel Darko <samidarko@gmail.com>
 
 """
+import re
 from django import forms
 from datetime import datetime, timedelta
 from semiocoder.encoder.models import Joblist, Job, Task, Encoder, Extension
+
+
+white_list='[^\w "\'-]+'
+options_regex = re.compile(white_list)
+
+class JobForm(forms.ModelForm):
+    """Classe formulaire de l'objet Job
+    """
+
+    name = forms.CharField(label='Nom * ')
+    encoder = forms.ModelChoiceField(Encoder.objects.all(), label='Encodeur * ') #, empty_label="------")
+    options = forms.CharField(label='Options * ')
+    extension = forms.ModelChoiceField(Extension.objects.all(), label='Extension * ') #, empty_label="------")
+
+    class Meta:
+        model = Job
+        fields = ('name', 'description', 'encoder', 'options', 'extension', )
+        
+    def clean(self):
+        cleaned_data = self.cleaned_data
+        options = cleaned_data.get("options")
+        
+        if options_regex.search(options):
+            self._errors["options"] = self.error_class(["Des options ne sont pas autorisées, merci de contacter l'administrateur !"])
+
+        # Always return the full collection of cleaned data.
+        return cleaned_data
+        
 
 class JoblistForm(forms.ModelForm):
     """Classe formulaire de l'objet Joblist
@@ -29,20 +58,6 @@ class JoblistForm(forms.ModelForm):
     class Meta:
         model = Joblist
         fields = ('name', 'description', 'job')
-
-
-class JobForm(forms.ModelForm):
-    """Classe formulaire de l'objet Job
-    """
-
-    name = forms.CharField(label='Nom * ')
-    encoder = forms.ModelChoiceField(Encoder.objects.all(), label='Encodeur * ') #, empty_label="------")
-    options = forms.CharField(label='Options * ')
-    extension = forms.ModelChoiceField(Extension.objects.all(), label='Extension * ') #, empty_label="------")
-
-    class Meta:
-        model = Job
-        fields = ('name', 'description', 'encoder', 'options', 'extension', )
         
 
 class TaskForm(forms.ModelForm):
