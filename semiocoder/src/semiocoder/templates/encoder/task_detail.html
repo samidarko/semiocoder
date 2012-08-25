@@ -8,21 +8,20 @@
 		<h2 class="title">Detail de la tache : {{ object.joblist.name }}</h2>
 
 		<ul>
-		    <li>Planification : {{ object.schedule }}</li>
+		    <li class="first"><span>Planification : {{ object.schedule }}</span></li>
 		    <li>Etat : {% if object.state == 'W' %} waiting {% else %}
 		    			{% if object.state == 'P' %} pending {% else %}
 		    			{% if object.state == 'R' %} running {% else %}
 		    			{% endif %}{% endif %}{% endif %}
-		    </li>
-		    <li>Fichier source : {{ object.source_file }}</li>
-		    <li>Jobs en sortie : {{ object.joblist.job.select_related|length }}</li>
-		    <li>Notification  : {{ object.notify  }}</li>
-			
+		    </span></li>
+		    <li><span>Fichier source : {{ object.source_file }}</span></li>
+		    <li><span>Jobs en sortie : {{ object.joblist.job.select_related|length }}</span></li>
+		    <li class="last"><span>Notification  : {{ object.notify  }}</span></li>
 		</ul>
 
 		{% if object.state == 'W' %}
 		<p>
-		<a class="submit" href="{% url task_edit id %}">Editer</a><a class="submit" href="{% url task_delete id %}">Supprimer</a>
+			<a class="submit" href="{% url task_edit id %}">Editer</a><a class="submit" href="{% url task_delete id %}">Supprimer</a>
 		</p>
 		{% endif %}
 	</div>

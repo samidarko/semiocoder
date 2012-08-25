@@ -12,6 +12,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.deletion import Collector
 from django.db import router
+from django.core.urlresolvers import reverse
 
 
 class Encoder(models.Model):
@@ -42,12 +43,10 @@ class Job(models.Model):
     def __unicode__(self):
         return "%s" % (self.name)
     
-    def getDetails(self):
-        details = {}
-        for name in self.__dict__:
-            if not name.startswith('_'):
-                details[name] =  self.__dict__[name]
-        return details
+    def get_absolute_url(self):        
+        return reverse('job_detail', args = [ self.id, ])
+
+
 
 class Joblist(models.Model):
     name = models.CharField("nom", max_length=30)
@@ -60,12 +59,9 @@ class Joblist(models.Model):
     def __unicode__(self):
         return "%s" % (self.name)
     
-    def getDetails(self):
-        details = {}
-        for name in self.__dict__:
-            if not name.startswith('_'):
-                details[name] =  self.__dict__[name]
-        return details
+    def get_absolute_url(self):        
+        return reverse('joblist_detail', args = [ self.id, ])
+
 
 
 class Task(models.Model):
@@ -78,6 +74,9 @@ class Task(models.Model):
     
     def __unicode__(self):
         return "task %d" % (self.id)
+    
+    def get_absolute_url(self):        
+        return reverse('task_detail', args = [ self.id, ])
     
     def delete(self, using=None):
         """Surcharge de la methode save pour supprimer le fichier source avant l objet
@@ -98,13 +97,7 @@ class Task(models.Model):
         collector = Collector(using=using)
         collector.collect([self])
         collector.delete()
-    
-    def getDetails(self):
-        details = {}
-        for name in self.__dict__:
-            if not name.startswith('_'):
-                details[name] =  self.__dict__[name]
-        return details
+
 
 class TaskHistory(models.Model):
     joblist = models.CharField(max_length=30)
@@ -114,6 +107,11 @@ class TaskHistory(models.Model):
     endtime = models.DateTimeField()
     outputdir = models.CharField(max_length=20)
     log = models.TextField(null=True, blank=True)
+    
+    def __unicode__(self):
+        return "task history %d" % (self.id)
+
+    
     
 
     

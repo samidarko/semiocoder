@@ -110,7 +110,8 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     #'django.contrib.admindocs',
     'semiocoder.encoder',
-    'djcelery'
+    'djcelery',
+    'django_extensions',
 )
 
 # Configuration dcelery

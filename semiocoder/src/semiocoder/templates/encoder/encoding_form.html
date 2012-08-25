@@ -11,7 +11,17 @@
 {% block scripts %}
 	
 	<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.validate.js"></script>
-	<script type="text/javascript">    
+	<script type="text/javascript">
+		jQuery.validator.addMethod(
+			  "regex",
+			   function(value, element, regexp) {
+			       if (regexp.constructor != RegExp)
+			          regexp = new RegExp(regexp,"g");
+			       else if (regexp.global)
+			          regexp.lastIndex = 0;
+			          return this.optional(element) || regexp.test(value);
+			   },"options non conformes"
+			);
 	    jQuery(document).ready(function() {
 	    	   jQuery("#start").validate({
 	    	      rules: {
@@ -23,6 +33,7 @@
 		    	     },
 		    	     "options":{
 			    	    "required": true,
+			    	    "regex": /^(\d|\w|[- '"])*$/,
 		    	     },
 		    	     "extension":{
 			    	    "required": true,

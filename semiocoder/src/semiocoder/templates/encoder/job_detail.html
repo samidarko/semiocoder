@@ -8,15 +8,18 @@
 		<h2 class="title">Detail du job : {{ object.name }}</h2>
 
 		<ul>
-		    <li>Description : {{ object.description }}</li>
-		    <li>Créé le : {{ object.created_on }}</li>
-		    <li>Modifié le : {{ object.modified_on }}</li>
-		    <li>Encodeur : {{ object.encoder.name }}</li>
-		    <li>Options : {{ object.options }}</li>
-		    <li>Extension : {{ object.extension }}</li>
+		    <li class="first"><span>Description : {{ object.description }}</span></li>
+		    <li><span>Créé le : {{ object.created_on }}</span></li>
+		    <li><span>Modifié le : {{ object.modified_on }}</span></li>
+		    <li><span>Encodeur : {{ object.encoder.name }}</span></li>
+		    <li><span>Options : {{ object.options }}</span></li>
+		    <li class="last"><span>Extension : {{ object.extension }}</span></li>
 		</ul>
+		
+		<p>
+			<a class="submit" href="{% url job_edit id %}">Editer</a><a class="submit" href="{% url job_delete id %}">Supprimer</a>
+		</p>
 
-		<a href="{% url job_edit id %}">Editer</a>&nbsp;-&nbsp;<a href="{% url job_delete id %}">Supprimer</a>
 	</div>
 
 {% endblock %}

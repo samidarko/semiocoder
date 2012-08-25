@@ -23,10 +23,11 @@ from django.utils.translation import ugettext
 from libs import getJobs, getTasks, getHistory
 
 # TODO: doctest
-# TODO: Ameliorer les pages detail (commencer par task)
 # TODO: Faire les tests unitaires
 # TODO: Mettre en place les notifications / rapport joint ?
-
+# TODO: finir regex coté client pour les options (-1 possible ?)
+# TODO: module core.reporting
+# TODO: champs recherche des datatable
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche
@@ -38,14 +39,11 @@ def search(request): # TODO: revoir les champs de recherche
     :returns: HttpResponse
     """
     query = request.POST.get('q', '')
+    results = []
     if query:
-        qset = (
-            Q(joblist__name__icontains=query) | Q(description__icontains=query)
-        )
-        results = Job.objects.filter(qset).distinct()
-    else:
-        results = []
-
+        results.extend(Joblist.objects.filter(Q(owner__exact=request.user),Q(name__icontains=query) | Q(description__icontains=query)).distinct())
+        results.extend(Job.objects.filter(Q(owner__exact=request.user),Q(name__icontains=query) | Q(description__icontains=query)).distinct())
+        results.sort()
     data =  { "results": results, "query": query }
 
     return render_to_response("search.html", data, context_instance=RequestContext(request))

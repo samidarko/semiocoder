@@ -605,3 +605,8 @@ a.submit:focus{
 	text-align: left;
 	padding-left: 10px;
 }
+
+/* search form */
+.result {
+	margin-top: 50px;
+}

@@ -8,13 +8,16 @@
 		<h2 class="title">Detail du joblist : {{ object.name }}</h2>
 
 		<ul>
-		    <li>Description : {{ object.description }}</li>
-		    <li>Créé le : {{ object.created_on }}</li>
-		    <li>Modifié le : {{ object.modified_on }}</li>
-		    <li>Jobs : {{ object.job.select_related|join:", " }}</li>
+		    <li class="first"><span>Description : {{ object.description }}</span></li>
+		    <li><span>Créé le : {{ object.created_on }}</span></li>
+		    <li><span>Modifié le : {{ object.modified_on }}</span></li>
+		    <li class="last"><span>Jobs : {{ object.job.select_related|join:", " }}</span></li>
 		</ul>
+		
+		<p>
+			<a class="submit" href="{% url joblist_edit id %}">Editer</a><a class="submit" href="{% url joblist_delete id %}">Supprimer</a>
+		</p>
 
-		<a href="{% url joblist_edit id %}">Editer</a>&nbsp;-&nbsp;<a href="{% url joblist_delete id %}">Supprimer</a>
 	</div>
 
 {% endblock %}
