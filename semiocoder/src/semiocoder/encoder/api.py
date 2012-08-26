@@ -7,6 +7,8 @@ from semiocoder.settings import LOGIN_URL
 from semiocoder.core.api import getEncoders, getJobDetails, getJoblistDetails, getJoblists, getJobs, getTaskDetails, getTasks, gethistorydetails
 from semiocoder.core.api import formatResult, getHistories, getEncoderDetails, setJob, setJoblist, setTask, login, logout
 
+# TODO: developper API
+
 @user_passes_test(lambda u: u.has_perm('encoder'), login_url=LOGIN_URL)
 def api(request):
     if request.method == 'GET':

@@ -68,7 +68,15 @@
 	                {% for j in joblist_list %}
 	                {
 	                    "data" : { "title" : "<b>{{ j.name }}</b><i> - (créé par {{ j.owner }})</i>", "attr" : { "href" : "{% url joblist_detail j.id %}" } },
-	                    "attr" : { "id" : "_{{ j.id }}", "rel" : "joblist", "class" : "joblist-row" },
+	                    
+	                    {% if forloop.first %} 
+	                    	"attr" : { "id" : "_{{ j.id }}", "rel" : "joblist", "class" : "joblist-row first" },
+	                    {% else %}{% if forloop.last %} 
+	                    	"attr" : { "id" : "_{{ j.id }}", "rel" : "joblist", "class" : "joblist-row last" },
+	                    {% else %}
+	                    	"attr" : { "id" : "_{{ j.id }}", "rel" : "joblist", "class" : "joblist-row" }, 
+	          			{% endif %}{% endif %}
+
 	                    "state" : "closed"
 	                },
 	                {% endfor %}

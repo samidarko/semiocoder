@@ -6,21 +6,18 @@
 {% block content %}
 
 <div class="box">
-	<h2 class="title">Output files</h2>
+	<h2 class="title">Fichiers généres</h2>
 	<form action="{% url task_output th.id %}" method="post">
+		<h1>Télécharger ou supprimer ?</h1>
 		{% csrf_token %}
-		<p>
-			<ul> 
-				{% for outputfile in outputfiles %}
-					<li>
-						<label for="id_outputfiles_{{ forloop.counter0 }}">
-						<input type="checkbox" name="outputfiles" value="{{ MEDIA_URL }}videos/{{ th.outputdir }}/{{ outputfile }}" id="id_outputfiles_{{ forloop.counter0 }}" />
-						<a href="{{ MEDIA_URL }}videos/{{ th.outputdir }}/{{ outputfile }}">{{ outputfile }}</a>
-						</label>
-					</li> 
-				{% endfor %}
-			</ul>
-		</p> 
+		
+		{% for outputfile in outputfiles %}
+			<p>
+				<input type="checkbox" name="outputfiles" value="{{ MEDIA_URL }}videos/{{ th.outputdir }}/{{ outputfile }}" id="id_outputfiles_{{ forloop.counter0 }}" />
+				<span><a href="{{ MEDIA_URL }}videos/{{ th.outputdir }}/{{ outputfile }}">{{ outputfile }}</a></span>
+			</p> 
+		{% endfor %}
+		
 	<input type="submit" value="Delete" />
 	</form>
 </div>

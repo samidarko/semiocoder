@@ -12,9 +12,7 @@ from celery import task
 from celery.task import periodic_task
 from celery.task.schedules import crontab
 from semiocoder.encoder.models import Task, TaskHistory
-
-# TODO: verifier que le binaire est bien appelé depuis exe
-# TODO: tester avec libav
+from libs import notify
 
 @task
 def taskLaucher(t):
@@ -35,14 +33,13 @@ def taskLaucher(t):
     for job in t.joblist.job.select_related():
         # Creation de la log
         log += "===== Log %s =============================\n\n" % (job.name)
-        
         # Preparation des params pour subprocess
-        args = [ job.encoder.name, ]                                                    # encodeur
+        args = [ os.path.basename(job.encoder.path), ]                                                    # encodeur
         if job.encoder.inputflag: args.append(job.encoder.inputflag)                    # option du fichier en entree
         args.append(t.source_file.url[1:])                                              # le chemin du fichier en entree
         args.extend(job.options.split())                                                # les options specifiees dans le job        
         if job.encoder.outputflag: args.append(job.encoder.outputflag)                  # option du fichier en sortie
-        output_filename = datetime.datetime.now().strftime("%H%M%S")+'-'+os.path.splitext(os.path.basename(t.source_file.url))[0]+'-'+job.name+'.'+job.extension.name
+        output_filename = datetime.datetime.now().strftime("%H%M%s")+'-'+os.path.splitext(os.path.basename(t.source_file.url))[0]+'-'+job.name+'.'+job.extension.name
         args.append('/'.join(t.source_file.url.split('/')[1:4]+[ output_filename, ]))   # chemin du fichier en sortie
         
         # Execution
@@ -63,8 +60,8 @@ def taskLaucher(t):
     th.save()
     
     # notification
-#    if t.notify:
-#        notify(level=t.notify, history=th.id)
+    if t.notify:
+        notify(t, th)
         
     # suppression de la tache
     t.delete()
@@ -72,7 +69,7 @@ def taskLaucher(t):
     return ret
         
         
-        
+# TODO: fn taskScheduler => lancer tache par tache ?
 
 @periodic_task(run_every=crontab(minute="*/5"))
 def taskScheduler():

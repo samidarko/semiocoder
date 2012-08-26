@@ -25,7 +25,13 @@
                 {% if results %}
                   <ul>
                   {% for result in results %}
-                        <li><a href="{{ result.get_absolute_url }}">{{ result }}</a></li>
+                  		{% if forloop.first %}
+                        	<li class="first"><span><a href="{{ result.get_absolute_url }}">{{ result }}</a></span></li>
+                  		{% else %}{% if forloop.last %}
+                  			<li class="last"><span><a href="{{ result.get_absolute_url }}">{{ result }}</a></span></li>
+                  		{% else %}
+                  			<li><span><a href="{{ result.get_absolute_url }}">{{ result }}</a></span></li>
+                  		{% endif %}{% endif %}
                   {% endfor %}
                   </ul>
                 {% else %}

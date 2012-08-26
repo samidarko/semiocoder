@@ -24,10 +24,12 @@ from libs import getJobs, getTasks, getHistory
 
 # TODO: doctest
 # TODO: Faire les tests unitaires
-# TODO: Mettre en place les notifications / rapport joint ?
-# TODO: finir regex coté client pour les options (-1 possible ?)
-# TODO: module core.reporting
-# TODO: champs recherche des datatable
+# TODO: Mettre en place les notifications / rapport joint ? module core.reporting
+# TODO: ajouter la recherche dans les taches (date)
+# TODO: ameliorer affichage des messages
+# TODO: securiser iptable ?
+# TODO: systeme de navigation dans les pages
+# TODO: pb systeme de navigation dans les datatables
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche

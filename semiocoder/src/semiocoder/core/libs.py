@@ -7,10 +7,15 @@
 .. moduleauthor:: Samuel Darko <samidarko@gmail.com>
 
 """
-import datetime, feedparser
+import datetime, feedparser, os
 from django.core.mail import EmailMultiAlternatives
 from django.contrib.auth.models import User
 from semiocoder.encoder.models import TaskHistory
+from settings import EMAIL_FILE_PATH, SERVER_EMAIL
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+
 
 def getAARFeed():
     """Renvoi les 6 dernières nouvelles des AAR via leur flux RSS
@@ -27,22 +32,48 @@ def getAARFeed():
     return news
 
 
-def notify(history):
+styles=getSampleStyleSheet()
+
+
+def makeTaskLogToPdf(th):
+    reportname = EMAIL_FILE_PATH+'/'+th.joblist+".pdf"
+    doc = SimpleDocTemplate(reportname,pagesize=A4, rightMargin=72,leftMargin=72, topMargin=72,bottomMargin=18)
+    Story=[]
+    Story.append(Paragraph('Log de la joblist '+th.joblist, styles["Title"]))
+    Story.append(Spacer(1, 12))
+
+    logtab = th.log.split('\n')
+
+    for line in logtab:
+        if line.startswith('====='):
+            Story.append(Paragraph(line, styles["Heading3"]))
+        else:
+            Story.append(Paragraph(line, styles["Normal"]))
+
+    doc.build(Story)
+    
+    report = open(reportname)
+    content = report.read()
+    report.close()
+    os.remove(reportname)
+    
+    return content
+
+
+def notify(t, th):
     """Fonction de notification de l'utilisateur (A revoir)
     
     :returns: None
     """
-    semiocoder = User.objects.get(pk=1).email
-    th = TaskHistory.objects.get(pk=history)
-    addressee = [ User.objects.get(username__exact=th.owner).email ]
 
     subject = str('La tache '+ th.joblist + ' s est termine avec le statut ' +th.state)
-    from_email, to = semiocoder, addressee
+    from_email, to = SERVER_EMAIL, (t.owner.email,)
     text_content = th.log
     html_content = th.log.replace("\n", "\n<br>")
     msg = EmailMultiAlternatives(subject, text_content, from_email, to)
     msg.attach_alternative(html_content, "text/html")
-    #msg.attach_file('report.pdf', 'application/pdf')
+    content = makeTaskLogToPdf(th)
+    msg.attach('report.pdf', content, 'application/pdf')
     msg.send()
 
 

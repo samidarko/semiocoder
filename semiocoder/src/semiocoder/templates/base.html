@@ -83,7 +83,13 @@ Released   : 20120624
 			{% if messages %}
 	        <ul class="messagelist">
 	        	{% for message in messages %}
-	          		<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+	          		{% if forloop.first %} 
+                    	<li{% if message.tags %} class="{{ message.tags }} first"{% endif %}>{{ message }}</li>
+                    {% else %}{% if forloop.last %} 
+                    	<li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% else %}
+                    	<li{% if message.tags %} class="{{ message.tags }} last"{% endif %}>{{ message }}</li>
+          			{% endif %}{% endif %}
 				{% endfor %}
 			</ul>
     		{% endif %}

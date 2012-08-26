@@ -91,7 +91,8 @@ LOGIN_URL = '/login'
 LOGOUT_URL = '/logout'
 
 # Email configuration
-EMAIL_HOST = 'smtp.free.fr'
+SERVER_EMAIL = 'contact@vedev.fr'
+EMAIL_HOST = 'smtp.bbox.fr'
 EMAIL_FILE_PATH = os.path.join(os.path.dirname(__file__),'mqueue').replace('\\','/')
 
 
