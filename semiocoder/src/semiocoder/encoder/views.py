@@ -31,7 +31,7 @@ from libs import getJobs, getTasks, getHistory
 # TODO: controle de l'espace (faire une partition separee au niveau du serveur)
 
 @login_required(login_url=LOGIN_URL)
-def search(request): # TODO: revoir les champs de recherche
+def search(request):
     """Affichage du formulaire de recherche du site
     
     :param request: Paramètres de la requête HTTP
