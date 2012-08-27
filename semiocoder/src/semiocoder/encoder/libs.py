@@ -70,7 +70,7 @@ def getTasks(user, first_id, last_id, search_str=None, sort_by="name", asc=True)
     :type search_str: Str
     :param sort_by: Nom de la colonne pour le tri
     :type sort_by: Str
-    :param asc: Order du tri, si positionné à vrai le tri est ascendant
+    :param asc: Ordre du tri, si positionné à vrai le tri est ascendant
     :type asc: bool
     
     :returns: tuple
@@ -84,7 +84,7 @@ def getTasks(user, first_id, last_id, search_str=None, sort_by="name", asc=True)
     
     if search_str:
         total_tasks = len(tasks)
-        search_args = Q(schedule__icontains=search_str)
+        search_args = Q(joblist__name__icontains=search_str)
         
         tasks = tasks.filter(search_args)
         filtered_tasks = len(tasks)
@@ -137,11 +137,11 @@ def getHistory(user, first_id, last_id, search_str=None, sort_by="name", asc=Tru
     sort_col = sort_col % sort_by
     
     tasks = TaskHistory.objects.filter(owner=user).order_by(sort_col)
+    print len(tasks)
     
     if search_str:
         total_tasks = len(tasks)
-        search_args = Q(schedule__icontains=search_str)
-        
+        search_args = Q(joblist__icontains=search_str)
         tasks = tasks.filter(search_args)
         filtered_tasks = len(tasks)
     else:
@@ -163,6 +163,7 @@ def getHistory(user, first_id, last_id, search_str=None, sort_by="name", asc=Tru
             '<a href="%s">log</a>' % (reverse('task_log', args = [ t.id, ])),
              ]
         tasks_list.append(task)
+
     return total_tasks, filtered_tasks, tasks_list
 
 

@@ -239,6 +239,10 @@ ul h4 {
 	background-repeat: no-repeat;
 	background-color: #E6F8DD;
 	padding: 0 0 0 20px;
+	margin-top: 12px;
+	font-size: 16px;
+	height: 18px;
+	line-height: 18px;
 	}
 
 .dropotron {
@@ -617,6 +621,12 @@ a.submit:focus{
 /* search form */
 .result {
 	margin-top: 50px;
+}
+
+.breadcrumbs {
+	font-family: 'Lucida Grande', 'DejaVu Sans', 'Bitstream Vera Sans', Verdana, Arial, sans-serif;
+	font-style: italic;
+	margin-top: 10px;
 }
 
 
