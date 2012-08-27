@@ -2,6 +2,9 @@
 
 {% block title %}Mes joblists{% endblock %}
 
+{% block breadcrumbs %}<a href="..">Accueil</a> › Mes joblists{% endblock %}
+
+
 {% block scripts %}
 	<script type="text/javascript" src="/static/js/jquery.jstree.js"></script>
 	<script type="text/javascript">
@@ -83,7 +86,7 @@
 	            ],
 	            "ajax" : {
 	                "url" : function(node) { 
-	                    var url = "/encoding/joblist/data";
+	                    var url = "/joblist/data";
 	                    url += node.attr ? node.attr("id").replace(/_/g, "/") : "";
 	                    return url; 
 	                }
@@ -99,7 +102,6 @@
 {% block content %}
 
 <div class="box">
-	<h2 class="title">Mes joblists</h2>
 	<div class="addLink"><a href="{% url joblist_add %}" title="">Ajouter une joblist</a></div>
 	<div id="joblist_tree"></div>
 

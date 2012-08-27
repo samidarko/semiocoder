@@ -2,10 +2,11 @@
 
 {% block title %}Detail du task : {{ object.joblist.name }}{% endblock %}
 
+{% block breadcrumbs %}<a href="..">Accueil</a> › <a href=".">Mes taches</a> › Detail de la tache "{{ object.joblist.name }}"{% endblock %}
+
 {% block content %}
 
 	<div class="box">
-		<h2 class="title">Detail de la tache : {{ object.joblist.name }}</h2>
 
 		<ul>
 		    <li class="first"><span>Planification : {{ object.schedule }}</span></li>

@@ -24,12 +24,11 @@ from libs import getJobs, getTasks, getHistory
 
 # TODO: doctest
 # TODO: Faire les tests unitaires
-# TODO: Mettre en place les notifications / rapport joint ? module core.reporting
 # TODO: ajouter la recherche dans les taches (date)
 # TODO: ameliorer affichage des messages
 # TODO: securiser iptable ?
-# TODO: systeme de navigation dans les pages
 # TODO: pb systeme de navigation dans les datatables
+# TODO: controle de l'espace (faire une partition separee au niveau du serveur)
 
 @login_required(login_url=LOGIN_URL)
 def search(request): # TODO: revoir les champs de recherche
@@ -45,6 +44,7 @@ def search(request): # TODO: revoir les champs de recherche
     if query:
         results.extend(Joblist.objects.filter(Q(owner__exact=request.user),Q(name__icontains=query) | Q(description__icontains=query)).distinct())
         results.extend(Job.objects.filter(Q(owner__exact=request.user),Q(name__icontains=query) | Q(description__icontains=query)).distinct())
+        results.extend(Task.objects.filter(Q(owner__exact=request.user),Q(joblist__name__icontains=query)).distinct())
         results.sort()
     data =  { "results": results, "query": query }
 
@@ -62,14 +62,14 @@ def job_delete(request, object_id):
     
     :returns: HttpResponse
     """
+    obj = get_object_or_404(Job, pk=object_id, owner=request.user)
     if request.method == 'POST':
-        obj = get_object_or_404(Job, pk=object_id, owner=request.user)
         obj.delete()
         msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'job'}
         messages.success(request, msg, fail_silently=True)
         return redirect("jobs")
     else:
-        return render_to_response('encoder/confirm_delete.html', { 'element' : 'job', 'title' : 'Job delete confirmation'}, context_instance=RequestContext(request))
+        return render_to_response('encoder/confirm_delete.html', { 'element' : 'job', 'obj' : obj,}, context_instance=RequestContext(request))
 
 
 @login_required(login_url=LOGIN_URL)
@@ -83,15 +83,14 @@ def joblist_delete(request, object_id):
     
     :returns: HttpResponse
     """
-
+    obj = get_object_or_404(Joblist, pk=object_id, owner=request.user)
     if request.method == 'POST':
-        obj = get_object_or_404(Joblist, pk=object_id, owner=request.user)
         obj.delete()
         msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'joblist'}
         messages.success(request, msg, fail_silently=True)
         return redirect("joblists")
     else:
-        return render_to_response('encoder/confirm_delete.html', { 'element' : 'joblist', 'title' : 'Joblist delete confirmation'}, context_instance=RequestContext(request))
+        return render_to_response('encoder/confirm_delete.html', { 'element' : 'joblist', 'obj' : obj,}, context_instance=RequestContext(request))
 
 
 @login_required(login_url=LOGIN_URL)
@@ -105,9 +104,8 @@ def task_delete(request, object_id):
     
     :returns: HttpResponse
     """
-
+    obj = get_object_or_404(Task, pk=object_id, owner=request.user)
     if request.method == 'POST':
-        obj = get_object_or_404(Task, pk=object_id, owner=request.user)
         if obj.state == 'W':
             obj.delete()
             msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'task'}
@@ -117,7 +115,7 @@ def task_delete(request, object_id):
             messages.error(request, msg, fail_silently=True)
         return redirect("tasks")
     else:
-        return render_to_response('encoder/confirm_delete.html', { 'element' : 'task', 'title' : 'Task delete confirmation'}, context_instance=RequestContext(request))
+        return render_to_response('encoder/confirm_delete.html', { 'element' : 'task', 'obj' : obj,}, context_instance=RequestContext(request))
 
 # Update
 @login_required(login_url=LOGIN_URL)

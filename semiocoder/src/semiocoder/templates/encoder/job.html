@@ -2,6 +2,8 @@
 
 {% block title %}Mes jobs{% endblock %}
 
+{% block breadcrumbs %}<a href="..">Accueil</a> › Mes jobs{% endblock %}
+
 {% block stylesheet %} 
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.22.custom.css" />
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/jquery.dataTables_themeroller.css" />
@@ -31,7 +33,6 @@
 
 {% block content %}
 	<div class="box">
-		<h2 class="title">Mes jobs</h2>
 		<div class="addLink"><a href="{% url job_add %}" title="">Ajouter un job</a></div>
 		<table id="job_table">
 		    <thead>

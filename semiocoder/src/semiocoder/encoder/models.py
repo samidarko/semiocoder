@@ -41,7 +41,7 @@ class Job(models.Model):
     extension = models.ForeignKey(Extension)
     
     def __unicode__(self):
-        return "%s" % (self.name)
+        return "job %s" % (self.name)
     
     def get_absolute_url(self):        
         return reverse('job_detail', args = [ self.id, ])
@@ -57,7 +57,7 @@ class Joblist(models.Model):
     job = models.ManyToManyField(Job)
 
     def __unicode__(self):
-        return "%s" % (self.name)
+        return "joblist %s" % (self.name)
     
     def get_absolute_url(self):        
         return reverse('joblist_detail', args = [ self.id, ])

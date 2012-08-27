@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 
-{% block title %}Detail du job : {{ object.name }}{% endblock %}
+{% block title %}Detail du job {{ object.name }}{% endblock %}
+
+{% block breadcrumbs %}<a href="..">Accueil</a> › <a href=".">Mes jobs</a> › Detail du job "{{ object.name }}"{% endblock %}
 
 {% block content %}
 
 	<div class="box">
-		<h2 class="title">Detail du job : {{ object.name }}</h2>
 
 		<ul>
 		    <li class="first"><span>Description : {{ object.description }}</span></li>

@@ -1,13 +1,16 @@
 {% extends "base.html" %}
 
-{% block title %}Recherche{% endblock %}
+{% block title %}Rechercher{% endblock %}
+
+{% block breadcrumbs %}<a href="../..">Accueil</a> › Rechercher{% endblock %}
 
 {% block content %}
 	<div class="box">
+
 		
 		<div class="search_form">
-			<h2 class="title">Rechercher</h2>
 	        <form id="start"  action="." method="POST">
+	        	<h1>Rechercher</h1>
 	        	{% csrf_token %}
 	        	<p>
 		            <label for="q">Mots clés : </label>

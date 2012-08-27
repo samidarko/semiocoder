@@ -79,7 +79,9 @@ Released   : 20120624
 		<br class="clearfix" />
 	</div>
 	<div id="page">
-		<div id="content">
+		<div class="breadcrumbs">
+      		{% block breadcrumbs %}{% endblock %}
+    	</div>
 			{% if messages %}
 	        <ul class="messagelist">
 	        	{% for message in messages %}
@@ -93,6 +95,7 @@ Released   : 20120624
 				{% endfor %}
 			</ul>
     		{% endif %}
+		<div id="content">
 			{% block content %}{% endblock %}
 			<br class="clearfix" />
 		</div>

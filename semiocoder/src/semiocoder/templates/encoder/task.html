@@ -2,6 +2,8 @@
 
 {% block title %}Mes taches{% endblock %}
 
+{% block breadcrumbs %}<a href="..">Accueil</a> › Mes taches{% endblock %}
+
 {% block stylesheet %} 
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.22.custom.css" />
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/dataTables/jquery.dataTables_themeroller.css" />
@@ -42,7 +44,6 @@
 {% block content %}
 
 <div class="box">
-	<h2 class="title">Mes taches</h2>
 	<div class="addLink"><a href="{% url task_add %}" title="">Ajouter une tache</a></div>
 <table id="task_table">
     <thead>

@@ -93,6 +93,7 @@ ul h4 {
 .box {
 	overflow: hidden;
 	margin-bottom: 1em;
+	padding-top: 35px;
 }
 
 .date {
@@ -289,7 +290,7 @@ ul h4 {
 }
 
 #page {
-	padding: 45px 45px 15px 45px;
+	padding: 10px 45px 15px 45px;
 	position: relative;
 	width: 890px;
 	margin: 0;

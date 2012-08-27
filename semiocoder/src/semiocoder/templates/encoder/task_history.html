@@ -1,6 +1,8 @@
 {% extends "base.html" %}
 
-{% block title %}Tasks history{% endblock %}
+{% block title %}Historique des taches{% endblock %}
+
+{% block breadcrumbs %}<a href="..">Accueil</a> › Historique des taches{% endblock %}
 
 {% block stylesheet %} 
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.22.custom.css" />
@@ -34,7 +36,6 @@
 
 {% block content %}
 	<div class="box">
-		<h2 class="title">Historique des taches</h2>
 		
 		<table id="taskhis_table">
 		    <thead>

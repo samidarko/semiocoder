@@ -70,10 +70,24 @@
 {% endblock %}
 
 
+{% block breadcrumbs %}<a href="{% url home %}">Accueil</a> › 
+
+	{% if element == 'task' %}
+		<a href="{% url tasks %}">Mes taches</a>
+	{% else %}{% if element == 'job' %}
+		<a href="{% url jobs %}">Mes jobs</a>
+	{% else %}{% if element == 'joblist' %}
+		<a href="{% url joblists %}">Mes joblists</a>
+	{% endif %}{% endif %}{% endif %}
+
+ › Ajout d'un element
+
+{% endblock %}
+
+
 {% block content %}
 
 	<div class="box">
-	<h2 class="title">{{ title }}</h2>
 	{% if form.is_multipart %}
     	<form enctype="multipart/form-data" id="start" action="{{ action }}" method="post">
 	{% else %}

@@ -2,10 +2,11 @@
 
 {% block title %}Mes joblists{% endblock %}
 
+{% block breadcrumbs %}<a href="..">Accueil</a> › <a href=".">Mes joblists</a> › Detail du joblist "{{ object.name }}"{% endblock %}
+
 {% block content %}
 
 	<div class="box">
-		<h2 class="title">Detail du joblist : {{ object.name }}</h2>
 
 		<ul>
 		    <li class="first"><span>Description : {{ object.description }}</span></li>
