@@ -2,8 +2,7 @@
 
 {% block title %}Log for {{ th.joblist }}{% endblock %}
 
-{% block breadcrumbs %}<a href="{% url home %}">Accueil</a> › <a href="{% url task_history %}">Historique des taches</a> › Log pour "{{ th.joblist }}"{% endblock %}
-
+{% block breadcrumbs %}<a href="{% url home %}">Accueil</a> › <a href="{% url tasks %}">Mes taches</a> › <a href="{% url task_history %}">Historique</a> › Log pour "{{ th.joblist }}"{% endblock %}
 
 {% block content %}
 

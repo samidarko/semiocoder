@@ -2,7 +2,7 @@
 
 {% block title %}Mes taches{% endblock %}
 
-{% block breadcrumbs %}<a href="..">Accueil</a> › Mes taches{% endblock %}
+{% block breadcrumbs %}<a href="{% url home %}">Accueil</a> › Mes taches{% endblock %}
 
 {% block stylesheet %} 
 	<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/jquery-ui/smoothness/jquery-ui-1.8.22.custom.css" />

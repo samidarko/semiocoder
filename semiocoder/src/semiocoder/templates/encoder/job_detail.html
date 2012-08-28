@@ -2,7 +2,7 @@
 
 {% block title %}Detail du job {{ object.name }}{% endblock %}
 
-{% block breadcrumbs %}<a href="..">Accueil</a> › <a href=".">Mes jobs</a> › Detail du job "{{ object.name }}"{% endblock %}
+{% block breadcrumbs %}<a href="{% url home %}">Accueil</a> › <a href="{% url jobs %}">Mes jobs</a> › Detail du job "{{ object.name }}"{% endblock %}
 
 {% block content %}
 

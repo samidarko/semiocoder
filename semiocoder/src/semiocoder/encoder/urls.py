@@ -9,11 +9,12 @@ urlpatterns = patterns('',
     url(r'^task/add$', views.task_create, name="task_add"),
     url(r'^task/edit/(\d+)$', views.task_update, name="task_edit"),
     url(r'^task/delete/(\d+)$', views.task_delete, name="task_delete"),
-    url(r'^task/output/(\d+)$', views.task_output, name="task_output"),
-    url(r'^task/log/(\d+)$', views.task_log, name="task_log"),
     url(r'^task/data$', views.task_data, name="task_data"),
     url(r'^task/history/$', views.task_history, name="task_history"),
     url(r'^task/history/data$', views.task_history_data, name="task_history_data"),
+    url(r'^task/history/output/(\d+)$', views.task_output, name="task_output"),
+    url(r'^task/history/log/(\d+)$', views.task_log, name="task_log"),
+    
     
     #Joblist
     url(r'^joblist/$', views.joblist_list, name="joblists"),

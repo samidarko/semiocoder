@@ -2,7 +2,7 @@
 
 {% block title %}Detail du task : {{ object.joblist.name }}{% endblock %}
 
-{% block breadcrumbs %}<a href="..">Accueil</a> › <a href=".">Mes taches</a> › Detail de la tache "{{ object.joblist.name }}"{% endblock %}
+{% block breadcrumbs %}<a href="{% url home %}">Accueil</a> › <a href="{% url tasks %}">Mes taches</a> › Detail de la tache "{{ object.joblist.name }}"{% endblock %}
 
 {% block content %}
 

@@ -25,10 +25,9 @@ from libs import getJobs, getTasks, getHistory
 # TODO: doctest
 # TODO: Faire les tests unitaires
 # TODO: ajouter la recherche dans les taches (date)
-# TODO: ameliorer affichage des messages
 # TODO: securiser iptable ?
-# TODO: pb systeme de navigation dans les datatables
 # TODO: controle de l'espace (faire une partition separee au niveau du serveur)
+# TODO: ameliorer les champs de recherche des datatable
 
 @login_required(login_url=LOGIN_URL)
 def search(request):
@@ -145,7 +144,7 @@ def job_update(request, object_id):
         form = JobForm(instance=obj)
 
     data.update({'form' : form, })
-    return render_to_response('encoder/encoding_form.html', data, context_instance=RequestContext(request))
+    return render_to_response('encoder/encoding_edit_form.html', data, context_instance=RequestContext(request))
 
 
 @login_required(login_url=LOGIN_URL)
@@ -175,7 +174,7 @@ def joblist_update(request, object_id):
         form = JoblistForm(request.user, instance=obj)
 
     data.update({'form' : form, })
-    return render_to_response('encoder/encoding_form.html', data, context_instance=RequestContext(request))
+    return render_to_response('encoder/encoding_edit_form.html', data, context_instance=RequestContext(request))
     
 @login_required(login_url=LOGIN_URL)
 def task_update(request, object_id):
@@ -204,7 +203,7 @@ def task_update(request, object_id):
         form = TaskForm(request.user, instance=obj)
 
     data.update({'form' : form, })
-    return render_to_response('encoder/encoding_form.html', data, context_instance=RequestContext(request))
+    return render_to_response('encoder/encoding_edit_form.html', data, context_instance=RequestContext(request))
 
     
 # Create
