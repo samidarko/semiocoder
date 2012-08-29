@@ -7,7 +7,7 @@
 .. moduleauthor:: Samuel Darko <samidarko@gmail.com>
 
 """
-import os
+import os, shutil
 from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.deletion import Collector
@@ -110,7 +110,26 @@ class TaskHistory(models.Model):
     
     def __unicode__(self):
         return "task history %d" % (self.id)
-
+    
+    
+    def delete(self, using=None):
+        """Surcharge de la methode save pour supprimer le fichier source avant l objet
+        """
+        using = using or router.db_for_write(self.__class__, instance=self)
+        assert self._get_pk_val() is not None, "%s object can't be deleted because its %s attribute is set to None." % (self._meta.object_name, self._meta.pk.attname)
+        
+        if self.outputdir:
+            try:
+                shutil.rmtree('media/videos/'+self.outputdir) # suppression du repertoire
+            except:
+                pass # Si un probleme survient on ne fait rien
+                
+        collector = Collector(using=using)
+        collector.collect([self])
+        collector.delete()
+        
+        
+        
     
     
 

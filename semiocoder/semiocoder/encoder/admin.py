@@ -55,7 +55,7 @@ admin.site.register(Task, TaskAdmin)
 class TaskHistoryAdmin(admin.ModelAdmin):
     """Classe d'administration de l'objet TaskHistory
     """
-    list_display = ('joblist', 'owner', 'state', 'starttime', 'endtime', )
+    list_display = ('joblist', 'owner', 'state', 'starttime', 'endtime', 'outputdir', )
     list_filter = ('state', )
     search_fields = ('joblist', )
 

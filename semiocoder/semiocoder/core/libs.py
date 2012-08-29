@@ -9,9 +9,7 @@
 """
 import datetime, feedparser, os
 from django.core.mail import EmailMultiAlternatives
-from django.contrib.auth.models import User
-from semiocoder.encoder.models import TaskHistory
-from settings import EMAIL_FILE_PATH, SERVER_EMAIL
+from semiocoder.settings import EMAIL_FILE_PATH, SERVER_EMAIL
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer

@@ -21,6 +21,7 @@ from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.contrib import messages
 from django.utils.translation import ugettext
 from libs import getJobs, getTasks, getHistory
+from django.http import Http404
 
 # TODO: doctest
 # TODO: Faire les tests unitaires
@@ -405,7 +406,7 @@ def task_output(request, object_id):
     try:
         files = os.listdir('media/videos/'+th.outputdir)
     except:
-        return redirect('task_history')
+        raise Http404()
     
     if request.method == 'POST':
         selectedfiles = request.POST.getlist('outputfiles') 
