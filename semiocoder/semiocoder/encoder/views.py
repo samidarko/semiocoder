@@ -39,6 +39,7 @@ def search(request):
     
     :returns: HttpResponse
     """
+    raise Exception()
     query = request.POST.get('q', '')
     results = []
     if query:
