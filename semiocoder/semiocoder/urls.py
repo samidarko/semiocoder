@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from django.views import static
+from django.conf.urls.static import static
 from django.views.generic.simple import direct_to_template
 from semiocoder import settings
 from semiocoder.core.libs import getAARFeed
@@ -18,12 +18,10 @@ urlpatterns = patterns('',
     url(r'^user/change_password$', 'django.contrib.auth.views.password_change', {'template_name' : 'registration/password_change.html', 'post_change_redirect' : '/'}),
     (r'^', include('semiocoder.encoder.urls')),
     (r'^admin/', include(admin.site.urls)),
-    #(r'^%s(?P<path>.*)$' % settings.STATIC_URL[1:], static.serve, {'document_root' : settings.STATIC_ROOT}),
-    (r'^%s(?P<path>.*)$' % settings.MEDIA_URL[1:], static.serve, {'document_root' : settings.MEDIA_ROOT}),
-
 )
 
 if settings.DEBUG:
-    urlpatterns += patterns('django.contrib.staticfiles.views',
-        url(r'^static/(?P<path>.*)$', 'serve'),
-    )
+#    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    
+

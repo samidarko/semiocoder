@@ -15,7 +15,7 @@
 		    			{% if object.state == 'R' %} running {% else %}
 		    			{% endif %}{% endif %}{% endif %}
 		    </span></li>
-		    <li><span>Fichier source : {{ object.source_file }}</span></li>
+		    <li><span>Fichier source : {{ object.filename }}</span></li>
 		    <li><span>Jobs en sortie : {{ object.joblist.job.select_related|length }}</span></li>
 		    <li class="last"><span>Notification  : {{ object.notify  }}</span></li>
 		</ul>

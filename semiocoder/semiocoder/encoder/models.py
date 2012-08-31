@@ -13,11 +13,13 @@ from django.contrib.auth.models import User
 from django.db.models.deletion import Collector
 from django.db import router
 from django.core.urlresolvers import reverse
+from semiocoder import settings
+
 
 
 class Encoder(models.Model):
     name = models.CharField(max_length=10)
-    path = models.FilePathField(path='static/exe')
+    path = models.FilePathField(path=settings.ENCODER_ROOT)
     inputflag = models.CharField(max_length=10, blank=True, null=True)
     outputflag = models.CharField(max_length=10, blank=True, null=True)
 
@@ -75,6 +77,9 @@ class Task(models.Model):
     def __unicode__(self):
         return "task %d" % (self.id)
     
+    def filename(self):
+        return os.path.basename(self.source_file.name)
+    
     def get_absolute_url(self):        
         return reverse('task_detail', args = [ self.id, ])
     
@@ -86,7 +91,8 @@ class Task(models.Model):
         
         if self.source_file:
             tab_path = self.source_file.name.split('/') # decoupage du chemin vers le fichier source
-            rep_path = os.path.join("media",tab_path[0],tab_path[1]) # recomposition du chemin du repertoire du fichier source 
+            rep_path = os.path.join(os.path.join(settings.VIDEO_ROOT, tab_path[1]).replace('\\','/')) # recomposition du chemin du repertoire du fichier source 
+            
             self.source_file.delete() # suppression du fichier source
             if len(os.listdir(rep_path)) == 0: # si le repertoire du fichier source est vide
                 try:
@@ -120,7 +126,7 @@ class TaskHistory(models.Model):
         
         if self.outputdir:
             try:
-                shutil.rmtree('media/videos/'+self.outputdir) # suppression du repertoire
+                shutil.rmtree(os.path.join(settings.VIDEO_ROOT, self.outputdir).replace('\\','/')) # suppression du repertoire
             except:
                 pass # Si un probleme survient on ne fait rien
                 

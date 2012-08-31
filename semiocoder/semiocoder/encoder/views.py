@@ -7,7 +7,7 @@
 .. moduleauthor:: Samuel Darko <samidarko@gmail.com>
 
 """
-import os, json
+import os, json, shutil
 from django.db.models import Q
 from django.http import HttpResponse
 from django.views.generic.list_detail import object_detail
@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from models import Job, Joblist, Task, TaskHistory
 from semiocoder.encoder.forms import JobForm, JoblistForm, TaskForm
-from semiocoder.settings import LOGIN_URL
+from semiocoder.settings import LOGIN_URL, VIDEO_ROOT
 from django.template.context import RequestContext
 from django.shortcuts import redirect, render_to_response, get_object_or_404
 from django.contrib import messages
@@ -29,6 +29,7 @@ from django.http import Http404
 # TODO: securiser iptable ?
 # TODO: controle de l'espace (faire une partition separee au niveau du serveur)
 # TODO: ameliorer les champs de recherche des datatable
+# TODO: revoir le nom des fichiers en sortie
 
 @login_required(login_url=LOGIN_URL)
 def search(request):
@@ -39,7 +40,6 @@ def search(request):
     
     :returns: HttpResponse
     """
-    raise Exception()
     query = request.POST.get('q', '')
     results = []
     if query:
@@ -405,7 +405,8 @@ def task_output(request, object_id):
     th = get_object_or_404(TaskHistory, pk=object_id, owner=request.user)
 
     try:
-        files = os.listdir('media/videos/'+th.outputdir)
+        video_path = os.path.join(VIDEO_ROOT, th.outputdir).replace('\\','/')
+        files = os.listdir(video_path)
     except:
         raise Http404()
     
@@ -415,7 +416,7 @@ def task_output(request, object_id):
         for f in selectedfiles:
             filename = os.path.basename(f)
             try:
-                os.remove(f[1:])
+                os.remove(video_path+'/'+filename)
                 msg = ugettext("The %(verbose_name)s was deleted.") %  {"verbose_name": 'fichier %s' % filename}
                 messages.success(request, msg, fail_silently=True)
             except OSError:
@@ -423,8 +424,8 @@ def task_output(request, object_id):
                 messages.error(request, msg, fail_silently=True)
         # si il n y a plus de fichiers on supprime le repertoire
         if len(selectedfiles) == len(files):
-            os.rmdir('media/videos/'+th.outputdir)
-            th.outputdir = ""
+            shutil.rmtree(video_path)
+            th.outputdir = ''
             th.save()
             return redirect('task_history')
         return redirect('task_output', object_id)
