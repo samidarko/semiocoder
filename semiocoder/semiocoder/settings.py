@@ -44,9 +44,11 @@ USE_L10N = True
 # If you set this to False, Django will not use timezone-aware datetimes.
 USE_TZ = False
 
+PROJECT_ROOT = os.path.join(os.getcwd(), 'semiocoder').replace('\\','/')
+
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = os.path.join(os.getcwd(), __package__, 'media').replace('\\','/')
+MEDIA_ROOT = os.path.join(PROJECT_ROOT, 'media').replace('\\','/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -57,7 +59,9 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.getcwd().replace('\\','/')
+
+STATIC_ROOT = os.path.join(os.getcwd()).replace('\\','/')
+#STATIC_ROOT = os.path.join(PROJECT_ROOT, 'static').replace('\\','/')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -72,7 +76,7 @@ STATICFILES_DIRS = (
     STATIC_DIR,
 )
 
-ENCODER_ROOT = os.path.join(STATIC_DIR, 'exe').replace('\\','/')
+ENCODER_ROOT = os.path.join(STATIC_ROOT, 'exe').replace('\\','/')
 VIDEO_ROOT = os.path.join(MEDIA_ROOT, 'videos').replace('\\','/')
 
 # List of finder classes that know how to find static files in
@@ -113,10 +117,10 @@ WSGI_APPLICATION = 'semiocoder.wsgi.application'
 # Email configuration
 SERVER_EMAIL = 'contact@vedev.fr'
 EMAIL_HOST = 'smtp.bbox.fr'
-EMAIL_FILE_PATH = os.path.join(os.path.dirname(__file__),'mqueue').replace('\\','/')
+EMAIL_FILE_PATH = os.path.join(PROJECT_ROOT, 'mqueue').replace('\\','/') 
 
 TEMPLATE_DIRS = (
-    os.path.join(os.path.dirname(__file__),'templates').replace('\\','/'),
+    os.path.join(PROJECT_ROOT, 'templates').replace('\\','/'),
 )
 
 INSTALLED_APPS = (

@@ -609,23 +609,38 @@ a.submit:focus{
 }
 
 /* logo table in about */
-.logo_table {
+#logo_table {
 	margin-left: auto;
 	margin-right: auto;
 }
 
-.logo_table td {
-	width: 200px;
+#logo_table td {
+	width: 180px;
+	padding: 5px 5px 5px 5px;
 }
 
-.logo_table .left {
+#logo_table .top.left {
+	text-align: right;
+	padding-right: 5px;
+}
+
+#logo_table .top.right {
+	text-align: left;
+	padding-left: 5px;
+}
+
+#logo_table .middle.left {
+	text-align: left;
+	padding-left: 10px;
+}
+
+#logo_table .middle.right {
 	text-align: right;
 	padding-right: 10px;
 }
 
-.logo_table .right {
-	text-align: left;
-	padding-left: 10px;
+#logo_table .bottom {
+	text-align: center;
 }
 
 /* search form */
