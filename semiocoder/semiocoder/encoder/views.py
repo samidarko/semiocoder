@@ -30,6 +30,7 @@ from django.http import Http404
 # TODO: controle de l'espace (faire une partition separee au niveau du serveur)
 # TODO: ameliorer les champs de recherche des datatable
 # TODO: revoir le nom des fichiers en sortie
+# TODO: control client : verifier la longueur des champs + options exclure le nom du fichier a la fin
 
 @login_required(login_url=LOGIN_URL)
 def search(request):

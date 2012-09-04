@@ -34,12 +34,12 @@ class Extension(models.Model):
 
 class Job(models.Model):
     name = models.CharField("nom", max_length=30)
-    description = models.CharField("description", max_length=100, null=True, blank=True)
+    description = models.CharField("description", max_length=200, null=True, blank=True)
     owner = models.ForeignKey(User)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now = True)
     encoder = models.ForeignKey(Encoder, verbose_name="encodeur")
-    options = models.CharField(max_length=240)
+    options = models.CharField(max_length=350)
     extension = models.ForeignKey(Extension)
     
     def __unicode__(self):
@@ -52,7 +52,7 @@ class Job(models.Model):
 
 class Joblist(models.Model):
     name = models.CharField("nom", max_length=30)
-    description = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=200, null=True, blank=True)
     owner = models.ForeignKey(User)
     created_on = models.DateTimeField(auto_now_add=True)
     modified_on = models.DateTimeField(auto_now = True)

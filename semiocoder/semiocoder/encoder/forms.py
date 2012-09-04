@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 from semiocoder.encoder.models import Joblist, Job, Task, Encoder, Extension
 
 
-white_list='[^\w "\'-]+'
+white_list='[^\w :="\'-]+'
 options_regex = re.compile(white_list)
 
 class JobForm(forms.ModelForm):
