@@ -9,6 +9,7 @@
 """
 import re
 from django import forms
+from django.forms.widgets import Textarea
 from datetime import datetime, timedelta
 from semiocoder.encoder.models import Joblist, Job, Task, Encoder, Extension
 
@@ -21,14 +22,15 @@ class JobForm(forms.ModelForm):
     """
 
     name = forms.CharField(label='Nom * ')
-    encoder = forms.ModelChoiceField(Encoder.objects.all(), label='Encodeur * ') #, empty_label="------")
-    options = forms.CharField(label='Options * ')
+    description = forms.CharField(widget=Textarea(attrs={'rows': 4}))
+    encoder = forms.ModelChoiceField(Encoder.objects.all(), label='Encodeur * ',) #, empty_label="------")
+    options = forms.CharField(label='Options * ', widget=Textarea(attrs={'rows': 2}))
     extension = forms.ModelChoiceField(Extension.objects.all(), label='Extension * ') #, empty_label="------")
 
     class Meta:
         model = Job
         fields = ('name', 'description', 'encoder', 'options', 'extension', )
-        
+
     def clean(self):
         cleaned_data = self.cleaned_data
         options = cleaned_data.get("options")
@@ -54,6 +56,7 @@ class JoblistForm(forms.ModelForm):
         super(JoblistForm, self).__init__(*args, **kwargs)
         self.fields['name'] = forms.CharField(label='Nom * ')
         self.fields['job'] = forms.ModelMultipleChoiceField(Job.objects.filter(owner=user), label='Jobs * ') # On filtre le queryset par utilisateur
+        self.fields['description'].widget = Textarea(attrs={'rows': 4})
     
     class Meta:
         model = Joblist
