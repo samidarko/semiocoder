@@ -32,6 +32,7 @@ from django.http import Http404
 # TODO: revoir le nom des fichiers en sortie
 # TODO: control client : verifier la longueur des champs + options exclure le nom du fichier a la fin
 # TODO: dans le formulaire de selection de fichier ajouter une case "select all"
+# TODO: truncate au niveau des description des jobs
 
 @login_required(login_url=LOGIN_URL)
 def search(request):

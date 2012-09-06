@@ -551,7 +551,7 @@ input[type=password]{
 	-moz-box-shadow:0 0 3px #aaa;
 	-webkit-box-shadow:0 0 3px #aaa;
 	padding:5px;
-	width: 190px;
+	width: 270px;
 }
 
 textarea:focus,
@@ -567,7 +567,7 @@ select{
 	padding:3px;
 	-moz-box-shadow:0 0 3px #aaa;
 	-webkit-box-shadow:0 0 3px #aaa;
-	width: 200px;
+	width: 280px;
 }
 select:active,
 select:focus{
