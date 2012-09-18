@@ -1,9 +1,8 @@
-import os
-import json
+import os, json, datetime
 from django.contrib.auth import views
-from django.http import HttpResponseRedirect
-from semiocoder.settings import LOGOUT_URL
-from semiocoder.encoder.models import Encoder, Job, Joblist, Task, TaskHistory
+from django.shortcuts import get_object_or_404
+from semiocoder.settings import VIDEO_ROOT, MEDIA_URL
+from semiocoder.encoder.models import Encoder, Job, Joblist, Task, TaskHistory, Extension
 from semiocoder.encoder.forms import TaskForm, JobForm, JoblistForm
 from xml.dom.minidom import Document
 
@@ -32,120 +31,142 @@ def formatResult(formatting, result):
             document.appendChild(root)
         return document
 
-def logout():
-    return HttpResponseRedirect(LOGOUT_URL)
+
+def logout(user):
+    return { 'semiocoder' : { 'logout' :  datetime.datetime.now(), } }
+
 
 def login(r):
     views.login(r, redirect_field_name='/api')
+    
 
-
-def getEncoderDetails(encoder):
+def getEncoderDetail(user, object_id):
     result = {}
-    encoder = Encoder.objects.get(pk=encoder)
+    encoder = get_object_or_404(Encoder, pk=object_id)
     result["id"] = encoder.id
     result["name"] = encoder.name
     result["inputflag"] = encoder.inputflag
     result["outputflag"] = encoder.outputflag
     return { 'encoder' : result }
 
-    
 
-def getEncoders():
+def getEncoders(user):
     result = {}
     result["encoders"] = []
     encoders = Encoder.objects.all()
     for encoder in encoders:
-        result["encoders"].append(getEncoderDetails(encoder.id))
+        result["encoders"].append(getEncoderDetail(user, encoder.id))
     return result
+   
 
-def getJobDetails(job):
+def getExtensionDetail(user, object_id):
     result = {}
-    job = Job.objects.get(pk=job)
+    encoder = get_object_or_404(Extension, pk=object_id)
+    result["id"] = encoder.id
+    result["name"] = encoder.name
+    return { 'extension' : result }
+
+
+def getExtensions(user):
+    result = {}
+    result["extensions"] = []
+    extensions = Extension.objects.all()
+    for extension in extensions:
+        result["extensions"].append(getExtensionDetail(user, extension.id))
+    return result
+    
+
+
+def getJobDetail(user, object_id):
+    result = {}
+    job = get_object_or_404(Job, owner=user, pk=object_id)
     result["id"] = job.id
     result["name"] = job.name
     result["description"] = job.description
-    result["created_by"] = job.created_by
-    result["created_on"] = job.created_on.strftime('%Y-%m-%d %H:%M:%S')
-    result["modified_by"] = job.created_by
-    result["modified_on"] = job.modified_on.strftime('%Y-%m-%d %H:%M:%S')
+    result["owner"] = job.owner
+    result["created_on"] = job.created_on
+    result["modified_on"] = job.modified_on
     result["encoder"] = job.encoder.name
     result["options"] = job.options
-    result["outputfilename"] = job.outputfilename
     return { 'job' : result }
 
 
-def getJobs():
+def getJobs(user):
     result = {}
     result["jobs"] = []
-    jobs = Job.objects.all()
+    jobs = Job.objects.filter(owner=user)
     for job in jobs:
-        result["jobs"].append(getJobDetails(job.id))
+        result["jobs"].append(getJobDetail(user, job.id))
     return result
 
-def getJoblistDetails(joblist):
+
+def getJoblistDetail(user, object_id):
     result = {}
-    joblist = Joblist.objects.get(pk=joblist)
+    joblist = get_object_or_404(Joblist, owner=user, pk=object_id)
     result["id"] = joblist.id
     result["name"] = joblist.name
     result["description"] = joblist.description
-    result["created_by"] = joblist.created_by
-    result["created_on"] = joblist.created_on.strftime('%Y-%m-%d %H:%M:%S')
-    result["modified_by"] = joblist.created_by
-    result["modified_on"] = joblist.modified_on.strftime('%Y-%m-%d %H:%M:%S')
-    result["modified_on"] = joblist.modified_on.strftime('%Y-%m-%d %H:%M:%S')
+    result["owner"] = joblist.owner
+    result["created_on"] = joblist.created_on
+    result["modified_on"] = joblist.modified_on
     result["job"] =  [ item.name for item in joblist.job.select_related()]
     return { 'joblist' : result }
 
 
-def getJoblists():
+def getJoblists(user):
     result = {}
     result["joblists"] = []
-    joblists = Joblist.objects.all()
+    joblists = Joblist.objects.filter(owner=user)
     for joblist in joblists:
-        result["joblists"].append(getJoblistDetails(joblist.id))
+        result["joblists"].append(getJoblistDetail(user, joblist.id))
     return result
 
-def getTaskDetails(task):
+
+def getTaskDetail(user, object_id):
     result = {}
-    task = Task.objects.get(pk=task)
+    task = get_object_or_404(Task, owner=user, pk=object_id)
     result["id"] = task.id
     result["joblist"] = task.joblist.name
-    result["schedule"] = task.schedule.strftime('%Y-%m-%d %H:%M:%S')
+    result["schedule"] = task.schedule
     result["owner"] = task.owner
     result["state"] = task.state
     result["source_file"] = os.path.basename(task.source_file.name)
     result["notify"] = task.notify
     return { 'task' : result }
 
-def getTasks():
+
+def getTasks(user):
     result = {}
     result["tasks"] = []
-    tasks = Task.objects.all()
+    tasks = Task.objects.filter(owner=user)
     for task in tasks:
-        result["tasks"].append(getTaskDetails(task.id))
+        result["tasks"].append(getTaskDetail(user, task.id))
     return result
 
-def gethistorydetails(history):
+
+def getHistoryDetail(user, object_id):
     result = {}
-    history = TaskHistory.objects.get(pk=history)
+    history = get_object_or_404(TaskHistory, owner=user, pk=object_id)
     result["id"] = history.id
     result["joblist"] = history.joblist
     result["owner"] = history.owner
     result["state"] = history.state
-    result["starttime"] = history.starttime.strftime('%Y-%m-%d %H:%M:%S')
-    result["endtime"] = history.endtime.strftime('%Y-%m-%d %H:%M:%S')   
-    result["outputdir"] = [ '/static/videos/%s/%s' % (history.outputdir,f) for f in os.listdir("media/videos/"+history.outputdir)]
-    if len(result["outputdir"])==0: result["outputdir"]=['No Files']
+    result["starttime"] = history.starttime
+    result["endtime"] = history.endtime
+    if history.outputdir:
+        result["outputdir"] = [ '%svideos/%s/%s' % (MEDIA_URL,history.outputdir,f) for f in os.listdir(VIDEO_ROOT+"/"+history.outputdir)]
+    else:
+        result["outputdir"]=['No Files']
     result["log"] = history.log
     return { 'history' : result }
     
 
-def getHistories():
+def getHistories(user):
     result = {}
     result["histories"] = []
-    histories = TaskHistory.objects.all()
+    histories = TaskHistory.objects.filter(owner=user)
     for history in histories:
-        result["histories"].append(gethistorydetails(history.id))
+        result["histories"].append(getHistoryDetail(user, history.id))
     return result
 
 
@@ -161,7 +182,6 @@ def setJob(r):
     return result
 
 
-
 def setJoblist(r):
     username = r.user.username
     jl = Joblist(created_by=username, modified_by=username)
@@ -172,6 +192,7 @@ def setJoblist(r):
     else:
         result = "The joblist could not be created"
     return result
+
 
 def setTask(r):
     username = r.user.username
@@ -185,12 +206,3 @@ def setTask(r):
     return result
 
 
-        
-        
-        
-
-        
-
-
-
-    

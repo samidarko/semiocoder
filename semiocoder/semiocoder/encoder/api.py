@@ -1,15 +1,14 @@
 from xml.dom.minidom import Document
-from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.template.context import RequestContext
 from django.shortcuts import render_to_response
 from semiocoder.settings import LOGIN_URL
-from semiocoder.core.api import getEncoders, getJobDetails, getJoblistDetails, getJoblists, getJobs, getTaskDetails, getTasks, gethistorydetails
-from semiocoder.core.api import formatResult, getHistories, getEncoderDetails, setJob, setJoblist, setTask, login, logout
+from semiocoder.core.api import getEncoders, getJobDetail, getJoblistDetail, getJoblists, getJobs, getTaskDetail, getTasks, getHistoryDetail
+from semiocoder.core.api import formatResult, getHistories, getEncoderDetail, setJob, setJoblist, setTask, login, logout, getExtensions, getExtensionDetail
 
-# TODO: developper API
 
-@user_passes_test(lambda u: u.has_perm('encoder'), login_url=LOGIN_URL)
+@login_required(login_url=LOGIN_URL)
 def api(request):
     if request.method == 'GET':
         if "format" in request.GET:
@@ -22,20 +21,20 @@ def api(request):
             result = None
             
             fnGetNoArg = { "getencoders": getEncoders, "getjobs":  getJobs, "getjoblists": getJoblists, "gettasks": getTasks,
-                           "gethistories": getHistories, "logout": logout }
+                           "gethistories": getHistories, "getextensions": getExtensions, "logout": logout, }
             
-            fnGetOneArg = { "getencoderdetails": getEncoderDetails, "getjobdetails" : getJobDetails, "getjoblistdetails": getJoblistDetails,
-                            "gettaskdetails": getTaskDetails, "gethistorydetails": gethistorydetails,
+            fnGetOneArg = { "getencoderdetail": getEncoderDetail, "getjobdetail" : getJobDetail, "getjoblistdetail": getJoblistDetail,
+                            "gettaskdetail": getTaskDetail, "gethistorydetail": getHistoryDetail, "getextensiondetail" : getExtensionDetail,
                            }
             
             if action in fnGetNoArg:
-                result = formatResult(mimetype, fnGetNoArg[action]())
+                result = formatResult(mimetype, fnGetNoArg[action](request.user))
             else:
                 if "id" in request.GET:
                     Id = request.GET["id"]
                     if action in fnGetOneArg:
                         try:
-                            result = formatResult(mimetype, fnGetOneArg[action](Id))
+                            result = formatResult(mimetype, fnGetOneArg[action](request.user, Id))
                         except:
                             result = "bad arguments"
                     else:
@@ -80,5 +79,3 @@ def api(request):
     
     # A faire la partie set avec POST + appels vers les formulaire + save des objets
     # Login et logout
-    
-    
