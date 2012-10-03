@@ -39,6 +39,7 @@ def logout(user):
 def login(r):
     views.login(r, redirect_field_name='/api')
     
+#============ Ensemble des fonctions get ===========================
 
 def getEncoderDetail(user, object_id):
     result = {}
@@ -169,40 +170,100 @@ def getHistories(user):
         result["histories"].append(getHistoryDetail(user, history.id))
     return result
 
+#============ Ensemble des fonctions add ===========================
 
-def setJob(r):
-    username = r.user.username
-    j = Job(created_by=username, modified_by=username)
-    form = JobForm(r.POST, instance=j)
+def addJob(req):
+    j = Job(owner=req.user)
+    form = JobForm(req.POST, instance=j)
     if form.is_valid(): 
-        form.save()
-        result = "Job created"
+        obj = form.save()
+        return getJobDetail(req.user,obj.id)
     else:
-        result = "The job could not be created"
-    return result
+        return { 'job' : form.errors }
 
 
-def setJoblist(r):
-    username = r.user.username
-    jl = Joblist(created_by=username, modified_by=username)
-    form = JoblistForm(r.POST, instance=jl)
+def addJoblist(req):
+    jl = Joblist(owner=req.user)
+    form = JoblistForm(req.user, req.POST, instance=jl)
     if form.is_valid(): 
-        form.save()
-        result = "Joblist created"
+        obj = form.save()
+        return getJoblistDetail(req.user,obj.id)
     else:
-        result = "The joblist could not be created"
-    return result
+        return { 'joblist' : form.errors }
 
 
-def setTask(r):
-    username = r.user.username
-    t = Task(owner=username, state="idle")
-    form = TaskForm(r.POST, r.FILES, instance=t)
+def addTask(req):
+    t = Task(owner=req.user)
+    form = TaskForm(req.user, req.POST, req.FILES, instance=t)
     if form.is_valid():
-        form.save()
-        result = "Task created"
+        obj = form.save()
+        return getTaskDetail(req.user,obj.id)
     else:
-        result = "The task could not be created"
-    return result
+        return { 'task' : form.errors }
+
+#============ Ensemble des fonctions edit ===========================
+
+def editJob(req):
+    try:
+        j = Job.objects.get(id=req.POST['id'],owner=req.user)
+    except:
+        return { 'job' : { 'exception' : 'DoesNotExist' } } 
+    form = JobForm(req.POST, instance=j)
+    if form.is_valid(): 
+        obj = form.save()
+        return getJobDetail(req.user,obj.id)
+    else:
+        return { 'job' : form.errors }
 
 
+def editJoblist(req):
+    try:
+        jl = Joblist.objects.get(id=req.POST['id'],owner=req.user)
+    except:
+        return { 'joblist' : { 'exception' : 'DoesNotExist' } } 
+    form = JoblistForm(req.user, req.POST, instance=jl)
+    if form.is_valid(): 
+        obj = form.save()
+        return getJoblistDetail(req.user,obj.id)
+    else:
+        return { 'joblist' : form.errors }
+
+#============ Ensemble des fonctions delete ===========================
+
+def deleteJob(req):
+    try:
+        j = Job.objects.get(id=req.POST['id'],owner=req.user)
+    except:
+        return { 'job' : { 'exception' : 'DoesNotExist' } } 
+    
+    try:
+        j.delete()
+        return { 'job' : { 'status' : 'success' } }
+    except:
+        return { 'job' : { 'status' : 'fail' } }
+
+
+def deleteJoblist(req):
+    try:
+        jl = Joblist.objects.get(id=req.POST['id'],owner=req.user)
+    except:
+        return { 'joblist' : { 'exception' : 'DoesNotExist' } } 
+    
+    try:
+        jl.delete()
+        return { 'job' : { 'status' : 'success' } }
+    except:
+        return { 'job' : { 'status' : 'fail' } }
+    
+    
+def deleteTask(req):
+    try:
+        t = Task.objects.get(id=req.POST['id'],owner=req.user)
+    except:
+        return { 'task' : { 'exception' : 'DoesNotExist' } } 
+    
+    try:
+        t.delete()
+        return { 'job' : { 'status' : 'success' } }
+    except:
+        return { 'job' : { 'status' : 'fail' } }

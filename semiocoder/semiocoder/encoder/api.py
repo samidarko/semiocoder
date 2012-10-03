@@ -5,8 +5,8 @@ from django.template.context import RequestContext
 from django.shortcuts import render_to_response
 from semiocoder.settings import LOGIN_URL
 from semiocoder.core.api import getEncoders, getJobDetail, getJoblistDetail, getJoblists, getJobs, getTaskDetail, getTasks, getHistoryDetail
-from semiocoder.core.api import formatResult, getHistories, getEncoderDetail, setJob, setJoblist, setTask, login, logout, getExtensions, getExtensionDetail
-
+from semiocoder.core.api import formatResult, getHistories, getEncoderDetail, addJob, addJoblist, addTask, login, logout, getExtensions, getExtensionDetail
+from semiocoder.core.api import editJob, editJoblist, deleteJob, deleteJoblist, deleteTask
 
 @login_required(login_url=LOGIN_URL)
 def api(request):
@@ -50,7 +50,7 @@ def api(request):
             return render_to_response('api/api_help.html', context_instance=RequestContext(request))
         
     elif  request.method == 'POST':
-        
+
         if "format" in request.POST:
             mimetype = request.POST["format"]
             if mimetype not in ['xml', 'json']: mimetype = 'xml'
@@ -60,10 +60,11 @@ def api(request):
             action = request.POST["action"]
             result = None
             
-            fnPost = { "setjob":  setJob, "setjoblist":  setJoblist, "settask" : setTask, "login" : login, }
-        
+            fnPost = { "addjob":  addJob, "addjoblist":  addJoblist, "addtask" : addTask, "editjob" : editJob, "editjoblist" : editJoblist, "login" : login, 
+                        'deletejob' : deleteJob, 'deleteJoblist' : deleteJoblist, 'deleteTask' : deleteTask}
+
             if action in fnPost:
-                result = fnPost[action](request)
+                result = formatResult(mimetype, fnPost[action](request))
             else:
                 result = "no result"
                 
@@ -77,5 +78,4 @@ def api(request):
     else:
         return render_to_response('api/api_help.html', context_instance=RequestContext(request))
     
-    # A faire la partie set avec POST + appels vers les formulaire + save des objets
-    # Login et logout
+

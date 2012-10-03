@@ -22,7 +22,7 @@ class JobForm(forms.ModelForm):
     """
 
     name = forms.CharField(label='Nom * ')
-    description = forms.CharField(widget=Textarea(attrs={'rows': 4}))
+    description = forms.CharField(widget=Textarea(attrs={'rows': 4}), required=False)
     encoder = forms.ModelChoiceField(Encoder.objects.all(), label='Encodeur * ',) #, empty_label="------")
     options = forms.CharField(label='Options * ', widget=Textarea(attrs={'rows': 2}))
     extension = forms.ModelChoiceField(Extension.objects.all(), label='Extension * ') #, empty_label="------")
@@ -56,7 +56,7 @@ class JoblistForm(forms.ModelForm):
         super(JoblistForm, self).__init__(*args, **kwargs)
         self.fields['name'] = forms.CharField(label='Nom * ')
         self.fields['job'] = forms.ModelMultipleChoiceField(Job.objects.filter(owner=user), label='Jobs * ') # On filtre le queryset par utilisateur
-        self.fields['description'].widget = Textarea(attrs={'rows': 4})
+        self.fields['description'] = forms.CharField(widget=Textarea(attrs={'rows': 4}), required=False)
     
     class Meta:
         model = Joblist
