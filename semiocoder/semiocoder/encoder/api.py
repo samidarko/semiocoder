@@ -61,7 +61,7 @@ def api(request):
             result = None
             
             fnPost = { "addjob":  addJob, "addjoblist":  addJoblist, "addtask" : addTask, "editjob" : editJob, "editjoblist" : editJoblist, "login" : login, 
-                        'deletejob' : deleteJob, 'deleteJoblist' : deleteJoblist, 'deleteTask' : deleteTask}
+                        'deletejob' : deleteJob, 'deletejoblist' : deleteJoblist, 'deletetask' : deleteTask}
 
             if action in fnPost:
                 result = formatResult(mimetype, fnPost[action](request))

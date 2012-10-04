@@ -110,7 +110,7 @@ def getJoblistDetail(user, object_id):
     result["owner"] = joblist.owner
     result["created_on"] = joblist.created_on
     result["modified_on"] = joblist.modified_on
-    result["job"] =  [ item.name for item in joblist.job.select_related()]
+    result["job"] =  [ item.id for item in joblist.job.select_related()]
     return { 'joblist' : result }
 
 
