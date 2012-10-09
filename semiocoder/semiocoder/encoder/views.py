@@ -28,11 +28,12 @@ from django.http import Http404
 # TODO: ajouter la recherche dans les taches (date)
 # TODO: securiser iptable ?
 # TODO: controle de l'espace (faire une partition separee au niveau du serveur)
-# TODO: ameliorer les champs de recherche des datatable
+# TODO: ameliorer les champs de recherche des datatable et corriger la longueur
 # TODO: revoir le nom des fichiers en sortie
 # TODO: control client : verifier la longueur des champs + options exclure le nom du fichier a la fin
 # TODO: dans le formulaire de selection de fichier ajouter une case "select all"
 # TODO: truncate au niveau des description des jobs
+ 
 
 @login_required(login_url=LOGIN_URL)
 def search(request):

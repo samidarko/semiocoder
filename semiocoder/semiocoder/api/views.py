@@ -4,9 +4,10 @@ from django.http import HttpResponse
 from django.template.context import RequestContext
 from django.shortcuts import render_to_response
 from semiocoder.settings import LOGIN_URL
-from semiocoder.core.api import getEncoders, getJobDetail, getJoblistDetail, getJoblists, getJobs, getTaskDetail, getTasks, getHistoryDetail
-from semiocoder.core.api import formatResult, getHistories, getEncoderDetail, addJob, addJoblist, addTask, login, logout, getExtensions, getExtensionDetail
-from semiocoder.core.api import editJob, editJoblist, deleteJob, deleteJoblist, deleteTask
+from libs import getEncoders, getJobDetail, getJoblistDetail, getJoblists, getJobs, getTaskDetail, getTasks, getHistoryDetail
+from libs import formatResult, getHistories, getEncoderDetail, addJob, addJoblist, addTask, login, logout, getExtensions, getExtensionDetail
+from libs import editJob, editJoblist, deleteJob, deleteJoblist, deleteTask
+
 
 @login_required(login_url=LOGIN_URL)
 def api(request):

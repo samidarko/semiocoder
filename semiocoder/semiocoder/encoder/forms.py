@@ -62,7 +62,7 @@ class JoblistForm(forms.ModelForm):
         model = Joblist
         fields = ('name', 'description', 'job')
         
-
+# TODO: filter les fichiers a uploader en fonction de leur extension
 class TaskForm(forms.ModelForm):
     """Classe formulaire de l'objet Task
     """
