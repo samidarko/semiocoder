@@ -4,9 +4,9 @@ from django.http import HttpResponse
 from django.template.context import RequestContext
 from django.shortcuts import render_to_response
 from semiocoder.settings import LOGIN_URL
-from semiocoder.core.api import getEncoders, getJobDetail, getJoblistDetail, getJoblists, getJobs, getTaskDetail, getTasks, getHistoryDetail
-from semiocoder.core.api import formatResult, getHistories, getEncoderDetail, setJob, setJoblist, setTask, login, logout, getExtensions, getExtensionDetail
-
+#from semiocoder.core.api import getEncoders, getJobDetail, getJoblistDetail, getJoblists, getJobs, getTaskDetail, getTasks, getHistoryDetail
+#from semiocoder.core.api import formatResult, getHistories, getEncoderDetail, setJob, setJoblist, setTask, login, logout, getExtensions, getExtensionDetail
+from semiocoder.core.api import *
 
 @login_required(login_url=LOGIN_URL)
 def api(request):
@@ -17,8 +17,8 @@ def api(request):
         else:
             mimetype = 'xml'
         if "action" in request.GET:
+            
             action = request.GET["action"]
-            result = None
             
             fnGetNoArg = { "getencoders": getEncoders, "getjobs":  getJobs, "getjoblists": getJoblists, "gettasks": getTasks,
                            "gethistories": getHistories, "getextensions": getExtensions, "logout": logout, }
@@ -28,19 +28,20 @@ def api(request):
                            }
             
             if action in fnGetNoArg:
-                result = formatResult(mimetype, fnGetNoArg[action](request.user))
-            else:
+                try:
+                    result = formatResult(mimetype, fnGetNoArg[action](request.user))
+                except:
+                    result = "unknown error"
+            elif action in fnGetOneArg:
                 if "id" in request.GET:
-                    Id = request.GET["id"]
-                    if action in fnGetOneArg:
-                        try:
-                            result = formatResult(mimetype, fnGetOneArg[action](request.user, Id))
-                        except:
-                            result = "bad arguments"
-                    else:
-                        result = "no result"
+                    try:
+                        result = formatResult(mimetype, fnGetOneArg[action](request.user, request.GET['id']))
+                    except:
+                        result = "unknown error"
                 else:
-                    result = "no result"    
+                    result = "id parameter missing"
+            else:
+                result = "unknown action"
                     
             if isinstance(result, Document):
                 return HttpResponse(result.toprettyxml(), mimetype="text/xml")
@@ -56,16 +57,23 @@ def api(request):
             if mimetype not in ['xml', 'json']: mimetype = 'xml'
         else:
             mimetype = 'xml'
-        if "action" in request.POST:
-            action = request.POST["action"]
-            result = None
             
-            fnPost = { "setjob":  setJob, "setjoblist":  setJoblist, "settask" : setTask, "login" : login, }
+        if "action" in request.POST:
+            
+            action = request.POST["action"]
+            
+            fnPost = { "setjob":  setJob, "editjob": editJob, 'deletejob': deleteJob, 
+                      "setjoblist":  setJoblist, 'editjoblist': editJoblist, 'deletejoblist': deleteJoblist,
+                      "settask" : setTask, 'edittask' : editTask, 'deletetask' : deleteTask, "login" : login, }
         
             if action in fnPost:
-                result = fnPost[action](request)
+                try:
+                    result = formatResult(mimetype, fnPost[action](request))
+                except:
+                    raise
+                    result = "unknown error"
             else:
-                result = "no result"
+                result = "unknown action"
                 
             if isinstance(result, Document):
                 return HttpResponse(result.toprettyxml(), mimetype="text/xml")

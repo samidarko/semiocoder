@@ -108,8 +108,8 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'semiocoder.urls'
-LOGIN_URL = '/accounts/login'
-LOGOUT_URL = '/accounts/logout'
+LOGIN_URL = '/login'
+LOGOUT_URL = '/logout'
 
 # Python dotted path to the WSGI application used by Django's runserver.
 WSGI_APPLICATION = 'semiocoder.wsgi.application'
