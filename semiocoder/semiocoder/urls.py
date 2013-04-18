@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     url(r'^logout$', 'django.contrib.auth.views.logout', {'next_page' : '/'}, name="logout"),
     url(r'^user/change_password$', 'django.contrib.auth.views.password_change', {'template_name' : 'registration/password_change.html', 'post_change_redirect' : '/'}),
     (r'^', include('semiocoder.encoder.urls')),
+    (r'^', include('semiocoder.api.urls')),
     (r'^admin/', include(admin.site.urls)),
 )
 

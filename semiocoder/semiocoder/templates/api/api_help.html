@@ -124,7 +124,7 @@ Parameters:
 
 	!!! under development !!!
 	
-<b>* action=setjob *</b>
+<b>* action=addjob *</b>
 
 This module only accepts POST requests
 Parameters:
@@ -134,7 +134,7 @@ Parameters:
   options      - Encoding Options
   
 
-<b>* action=setjoblist *</b>
+<b>* action=addjoblist *</b>
 
 This module only accepts POST requests
 Parameters:
@@ -143,7 +143,7 @@ Parameters:
   job	       - Related Jobs
 
   
-<b>* action=settask *</b>
+<b>* action=addtask *</b>
 
 This module only accepts POST requests
 Parameters:
@@ -152,7 +152,49 @@ Parameters:
   source_file  - File to Encode
   notify       - Notification (Set "1" to notify User, set "2" for Group and leave empty to disable)
   
+  
+<b>* action=editjob *</b>
 
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+  name         - Job Name
+  description  - Description
+  encoder      - Encoder ID
+  options      - Encoding Options
+  
+
+<b>* action=editjoblist *</b>
+
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+  name         - Job Name
+  description  - Description
+  job	       - Related Jobs
+  
+  
+<b>* action=deletejob *</b>
+
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+  
+
+<b>* action=deletejoblist *</b>
+
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+
+  
+<b>* action=deletejoblist *</b>
+
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+
+  
 </pre>
 
 {% endblock %}
