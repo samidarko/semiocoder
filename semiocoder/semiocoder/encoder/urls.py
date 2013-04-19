@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-import views
+import views, api
 
 urlpatterns = patterns('',
 
@@ -32,7 +32,8 @@ urlpatterns = patterns('',
     url(r'^job/edit/(\d+)$', views.job_update, name="job_edit"),
     url(r'^job/delete/(\d+)$', views.job_delete, name="job_delete"),
     url(r'^job/data$', views.job_data, name="job_data"),
-
+    
+    url(r'^api$', api.api, name="api"),
     #Search
     url(r'^search/$', views.search, name="search"),
     
