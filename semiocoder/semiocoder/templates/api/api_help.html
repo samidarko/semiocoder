@@ -124,7 +124,7 @@ Parameters:
 
 	!!! under development !!!
 	
-<b>* action=addjob *</b>
+<b>* action=setjob *</b>
 
 This module only accepts POST requests
 Parameters:
@@ -134,7 +134,7 @@ Parameters:
   options      - Encoding Options
   
 
-<b>* action=addjoblist *</b>
+<b>* action=setjoblist *</b>
 
 This module only accepts POST requests
 Parameters:
@@ -143,7 +143,7 @@ Parameters:
   job	       - Related Jobs
 
   
-<b>* action=addtask *</b>
+<b>* action=settask *</b>
 
 This module only accepts POST requests
 Parameters:
@@ -174,6 +174,17 @@ Parameters:
   job	       - Related Jobs
   
   
+<b>* action=edittask *</b>
+
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+  joblist      - Joblist Id
+  schedule     - Scheduled Time (YYYY-mm-dd HH:MM:ss )
+  source_file  - File to Encode
+  notify       - Notification (Set "1" to notify User, set "2" for Group and leave empty to disable)
+  
+  
 <b>* action=deletejob *</b>
 
 This module only accepts POST requests
@@ -193,6 +204,21 @@ Parameters:
 This module only accepts POST requests
 Parameters:
   object_id    - Object Id
+
+
+<b>* action=deletefiles *</b>
+
+This module only accepts POST requests
+Parameters:
+  object_id    - Object Id
+  
+  
+<b>* action=getfiles *</b>
+
+This module only accepts GET requests
+Parameters:
+  object_id    - Object Id
+  target	   - target directory
 
   
 </pre>

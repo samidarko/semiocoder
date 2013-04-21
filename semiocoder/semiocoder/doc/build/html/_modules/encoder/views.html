@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -58,7 +56,7 @@
 <span class="sd">.. moduleauthor:: Samuel Darko &lt;samidarko@gmail.com&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="o">,</span> <span class="nn">json</span><span class="o">,</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">django.db.models</span> <span class="kn">import</span> <span class="n">Q</span>
 <span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">HttpResponse</span>
 <span class="kn">from</span> <span class="nn">django.views.generic.list_detail</span> <span class="kn">import</span> <span class="n">object_detail</span>
@@ -66,21 +64,28 @@
 <span class="kn">from</span> <span class="nn">django.contrib.auth.decorators</span> <span class="kn">import</span> <span class="n">login_required</span>
 <span class="kn">from</span> <span class="nn">models</span> <span class="kn">import</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Joblist</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">TaskHistory</span>
 <span class="kn">from</span> <span class="nn">semiocoder.encoder.forms</span> <span class="kn">import</span> <span class="n">JobForm</span><span class="p">,</span> <span class="n">JoblistForm</span><span class="p">,</span> <span class="n">TaskForm</span>
-<span class="kn">from</span> <span class="nn">semiocoder.settings</span> <span class="kn">import</span> <span class="n">LOGIN_URL</span>
+<span class="kn">from</span> <span class="nn">semiocoder.settings</span> <span class="kn">import</span> <span class="n">LOGIN_URL</span><span class="p">,</span> <span class="n">VIDEO_ROOT</span>
 <span class="kn">from</span> <span class="nn">django.template.context</span> <span class="kn">import</span> <span class="n">RequestContext</span>
 <span class="kn">from</span> <span class="nn">django.shortcuts</span> <span class="kn">import</span> <span class="n">redirect</span><span class="p">,</span> <span class="n">render_to_response</span><span class="p">,</span> <span class="n">get_object_or_404</span>
 <span class="kn">from</span> <span class="nn">django.contrib</span> <span class="kn">import</span> <span class="n">messages</span>
 <span class="kn">from</span> <span class="nn">django.utils.translation</span> <span class="kn">import</span> <span class="n">ugettext</span>
 <span class="kn">from</span> <span class="nn">libs</span> <span class="kn">import</span> <span class="n">getJobs</span><span class="p">,</span> <span class="n">getTasks</span><span class="p">,</span> <span class="n">getHistory</span>
+<span class="kn">from</span> <span class="nn">django.http</span> <span class="kn">import</span> <span class="n">Http404</span>
 
-<span class="c"># TODO: documentation + test</span>
-<span class="c"># TODO: Ameliorer le design des formulaires et des messages d&#39;erreur</span>
+<span class="c"># TODO: doctest</span>
 <span class="c"># TODO: Faire les tests unitaires</span>
-<span class="c"># TODO: Mettre en place les notifications / rapport joint ?</span>
-
+<span class="c"># TODO: ajouter la recherche dans les taches (date)</span>
+<span class="c"># TODO: securiser iptable ?</span>
+<span class="c"># TODO: controle de l&#39;espace (faire une partition separee au niveau du serveur)</span>
+<span class="c"># TODO: ameliorer les champs de recherche des datatable et corriger la longueur</span>
+<span class="c"># TODO: revoir le nom des fichiers en sortie</span>
+<span class="c"># TODO: control client : verifier la longueur des champs + options exclure le nom du fichier a la fin</span>
+<span class="c"># TODO: dans le formulaire de selection de fichier ajouter une case &quot;select all&quot;</span>
+<span class="c"># TODO: truncate au niveau des description des jobs</span>
+ 
 
 <span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
-<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.search">[docs]</a><span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span> <span class="c"># TODO: revoir les champs de recherche</span>
+<div class="viewcode-block" id="search"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.search">[docs]</a><span class="k">def</span> <span class="nf">search</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Affichage du formulaire de recherche du site</span>
 <span class="sd">    </span>
 <span class="sd">    :param request: Paramètres de la requête HTTP</span>
@@ -88,15 +93,13 @@
 <span class="sd">    </span>
 <span class="sd">    :returns: HttpResponse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;q&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&#39;q&#39;</span><span class="p">,</span> <span class="s">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="n">query</span><span class="p">:</span>
-        <span class="n">qset</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="n">Q</span><span class="p">(</span><span class="n">joblist__name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">description__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span>
-        <span class="p">)</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="n">Job</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">qset</span><span class="p">)</span><span class="o">.</span><span class="n">distinct</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Joblist</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">owner__exact</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span><span class="n">Q</span><span class="p">(</span><span class="n">name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">description__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">))</span><span class="o">.</span><span class="n">distinct</span><span class="p">())</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Job</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">owner__exact</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span><span class="n">Q</span><span class="p">(</span><span class="n">name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">)</span> <span class="o">|</span> <span class="n">Q</span><span class="p">(</span><span class="n">description__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">))</span><span class="o">.</span><span class="n">distinct</span><span class="p">())</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">Task</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">Q</span><span class="p">(</span><span class="n">owner__exact</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">),</span><span class="n">Q</span><span class="p">(</span><span class="n">joblist__name__icontains</span><span class="o">=</span><span class="n">query</span><span class="p">))</span><span class="o">.</span><span class="n">distinct</span><span class="p">())</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
     <span class="n">data</span> <span class="o">=</span>  <span class="p">{</span> <span class="s">&quot;results&quot;</span><span class="p">:</span> <span class="n">results</span><span class="p">,</span> <span class="s">&quot;query&quot;</span><span class="p">:</span> <span class="n">query</span> <span class="p">}</span>
 
     <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&quot;search.html&quot;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
@@ -113,14 +116,14 @@
 <span class="sd">    </span>
 <span class="sd">    :returns: HttpResponse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Job</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Job</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">}</span>
         <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;jobs&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Job delete confirmation&#39;</span><span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;job&#39;</span><span class="p">,</span> <span class="s">&#39;obj&#39;</span> <span class="p">:</span> <span class="n">obj</span><span class="p">,},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
 
 </div>
 <span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
@@ -134,15 +137,14 @@
 <span class="sd">    </span>
 <span class="sd">    :returns: HttpResponse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Joblist</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Joblist</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
         <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
         <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">}</span>
         <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;joblists&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Joblist delete confirmation&#39;</span><span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;joblist&#39;</span><span class="p">,</span> <span class="s">&#39;obj&#39;</span> <span class="p">:</span> <span class="n">obj</span><span class="p">,},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
 
 </div>
 <span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
@@ -156,9 +158,8 @@
 <span class="sd">    </span>
 <span class="sd">    :returns: HttpResponse</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
+    <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
-        <span class="n">obj</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">Task</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="s">&#39;W&#39;</span><span class="p">:</span>
             <span class="n">obj</span><span class="o">.</span><span class="n">delete</span><span class="p">()</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">}</span>
@@ -168,7 +169,7 @@
             <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&quot;tasks&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">,</span> <span class="s">&#39;title&#39;</span> <span class="p">:</span> <span class="s">&#39;Task delete confirmation&#39;</span><span class="p">},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/confirm_delete.html&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="s">&#39;element&#39;</span> <span class="p">:</span> <span class="s">&#39;task&#39;</span><span class="p">,</span> <span class="s">&#39;obj&#39;</span> <span class="p">:</span> <span class="n">obj</span><span class="p">,},</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
 
 <span class="c"># Update</span></div>
 <span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
@@ -198,7 +199,7 @@
         <span class="n">form</span> <span class="o">=</span> <span class="n">JobForm</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
-    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_edit_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
 
 </div>
 <span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
@@ -228,7 +229,7 @@
         <span class="n">form</span> <span class="o">=</span> <span class="n">JoblistForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
-    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_edit_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
     </div>
 <span class="nd">@login_required</span><span class="p">(</span><span class="n">login_url</span><span class="o">=</span><span class="n">LOGIN_URL</span><span class="p">)</span>
 <div class="viewcode-block" id="task_update"><a class="viewcode-back" href="../../encoder/views.html#encoder.views.task_update">[docs]</a><span class="k">def</span> <span class="nf">task_update</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">object_id</span><span class="p">):</span>
@@ -257,7 +258,7 @@
         <span class="n">form</span> <span class="o">=</span> <span class="n">TaskForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">,</span> <span class="n">instance</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
 
     <span class="n">data</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s">&#39;form&#39;</span> <span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="p">})</span>
-    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">render_to_response</span><span class="p">(</span><span class="s">&#39;encoder/encoding_edit_form.html&#39;</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">context_instance</span><span class="o">=</span><span class="n">RequestContext</span><span class="p">(</span><span class="n">request</span><span class="p">))</span>
 
     
 <span class="c"># Create</span></div>
@@ -457,9 +458,10 @@
     <span class="n">th</span> <span class="o">=</span> <span class="n">get_object_or_404</span><span class="p">(</span><span class="n">TaskHistory</span><span class="p">,</span> <span class="n">pk</span><span class="o">=</span><span class="n">object_id</span><span class="p">,</span> <span class="n">owner</span><span class="o">=</span><span class="n">request</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="s">&#39;media/videos/&#39;</span><span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
+        <span class="n">video_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">VIDEO_ROOT</span><span class="p">,</span> <span class="n">th</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\\</span><span class="s">&#39;</span><span class="p">,</span><span class="s">&#39;/&#39;</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">video_path</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;task_history&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">Http404</span><span class="p">()</span>
     
     <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s">&#39;POST&#39;</span><span class="p">:</span>
         <span class="n">selectedfiles</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">getlist</span><span class="p">(</span><span class="s">&#39;outputfiles&#39;</span><span class="p">)</span> 
@@ -467,7 +469,7 @@
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">selectedfiles</span><span class="p">:</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">video_path</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">filename</span><span class="p">)</span>
                 <span class="n">msg</span> <span class="o">=</span> <span class="n">ugettext</span><span class="p">(</span><span class="s">&quot;The </span><span class="si">%(verbose_name)s</span><span class="s"> was deleted.&quot;</span><span class="p">)</span> <span class="o">%</span>  <span class="p">{</span><span class="s">&quot;verbose_name&quot;</span><span class="p">:</span> <span class="s">&#39;fichier </span><span class="si">%s</span><span class="s">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">}</span>
                 <span class="n">messages</span><span class="o">.</span><span class="n">success</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
@@ -475,8 +477,8 @@
                 <span class="n">messages</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">msg</span><span class="p">,</span> <span class="n">fail_silently</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
         <span class="c"># si il n y a plus de fichiers on supprime le repertoire</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">selectedfiles</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">rmdir</span><span class="p">(</span><span class="s">&#39;media/videos/&#39;</span><span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">outputdir</span><span class="p">)</span>
-            <span class="n">th</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">video_path</span><span class="p">)</span>
+            <span class="n">th</span><span class="o">.</span><span class="n">outputdir</span> <span class="o">=</span> <span class="s">&#39;&#39;</span>
             <span class="n">th</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;task_history&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s">&#39;task_output&#39;</span><span class="p">,</span> <span class="n">object_id</span><span class="p">)</span>
@@ -701,7 +703,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2012, Samuel Darko.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

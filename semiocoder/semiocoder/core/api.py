@@ -3,32 +3,54 @@ from django.contrib.auth import views
 from semiocoder.settings import VIDEO_ROOT, MEDIA_URL
 from semiocoder.encoder.models import Encoder, Job, Joblist, Task, TaskHistory, Extension
 from semiocoder.encoder.forms import TaskForm, JobForm, JoblistForm
-from xml.dom.minidom import Document
 
+from xml.dom.minidom import getDOMImplementation
+
+def dict_to_xml(doc, el, values):
+
+    for k, v in values.iteritems():
+        
+        if isinstance (v, list):
+            child = doc.createElement(k)
+            for item in v:
+                object_type = item.keys()[0]
+                child.appendChild(dict_to_xml(doc, doc.createElement(object_type), item[object_type]))
+            el.appendChild(child)
+        elif isinstance (v, dict):
+            el.appendChild(dict_to_xml(doc, doc.createElement(k), v))
+        else:
+            child = doc.createElement(k)
+            child.appendChild(doc.createTextNode(unicode(v)))
+            el.appendChild(child)
+    
+    return el
+    
 
 def formatResult(formatting, result):
+
     if formatting == "json":
         return json.dumps(result)
     elif formatting == "xml":
-        document = Document()
-        root = document.createElement(result.keys()[0])
-        elements = result.values()[0]
-        if isinstance (elements, dict):
-            for k, v in elements.iteritems():
-                child1 = document.createElement(k)
-                child1.appendChild(document.createTextNode(str(v)))
-                root.appendChild(child1)
-            document.appendChild(root)
-        elif isinstance (elements, list):
-            for el in elements:
-                child1 = document.createElement(el.keys()[0])
-                for k, v in el.values()[0].iteritems():
-                    child2 = document.createElement(k)
-                    child2.appendChild(document.createTextNode(str(v)))
-                    child1.appendChild(child2)
-                root.appendChild(child1)
-            document.appendChild(root)
-        return document
+
+        impl = getDOMImplementation()
+        object_type = result.keys()[0]
+        doc = impl.createDocument(None, object_type, None)
+        root = doc.documentElement
+        values = result[object_type]
+        
+        if isinstance (values, dict):
+            
+            doc.appendChild(dict_to_xml(doc, root, values))
+            
+        elif isinstance (values, list):
+
+            for el in values:
+                object_type = el.keys()[0]
+                child = doc.createElement(object_type)
+                root.appendChild(dict_to_xml(doc, child, el[object_type]))
+            doc.appendChild(root)
+        
+        return doc
 
 
 def logout(user):
@@ -97,9 +119,10 @@ def getJobDetail(user, object_id):
         result["owner"] = obj.owner
         result["created_on"] = obj.created_on
         result["modified_on"] = obj.modified_on
-        result["encoder"] = obj.encoder.id
         result["options"] = obj.options
-        result["extension"] = obj.extension.id
+        result.update(getEncoderDetail(user, obj.encoder.id))
+        result.update(getExtensionDetail(user, obj.extension.id))
+
     except:
         result.update({ 'error' : "Job does not exist", 'id' : object_id, })
     
@@ -126,7 +149,7 @@ def getJoblistDetail(user, object_id):
         result["owner"] = obj.owner
         result["created_on"] = obj.created_on
         result["modified_on"] = obj.modified_on
-        result["job"] =  [ item.name for item in obj.job.select_related()]
+        result["jobs"] =  [ getJobDetail(user, job.id) for job in obj.job.select_related()]
     except:
         result.update({ 'error' : "Joblist does not exist", 'id' : object_id, })
     
@@ -148,12 +171,13 @@ def getTaskDetail(user, object_id):
     try:
         obj = Task.objects.get(owner=user, id=object_id)
         result["id"] = obj.id
-        result["joblist"] = obj.joblist.name
         result["schedule"] = obj.schedule
         result["owner"] = obj.owner
         result["state"] = obj.state
         result["source_file"] = os.path.basename(obj.source_file.name)
         result["notify"] = obj.notify
+        result.update(getJoblistDetail(user, obj.joblist.id))
+        
     except:
         result.update({ 'error' : "Task does not exist", 'id' : object_id, })
     
@@ -181,7 +205,10 @@ def getHistoryDetail(user, object_id):
         result["starttime"] = obj.starttime
         result["endtime"] = obj.endtime
         if obj.outputdir:
-            result["outputdir"] = [ '%svideos/%s/%s' % (MEDIA_URL,obj.outputdir,f) for f in os.listdir(VIDEO_ROOT+"/"+obj.outputdir)]
+            result["outputdir"] = [ ]
+            for filename in os.listdir(VIDEO_ROOT+"/"+obj.outputdir):
+                result["outputdir"].append({'file' : { 'name' : filename, 'path' : '%svideos/%s/%s' % (MEDIA_URL,obj.outputdir,filename), } } )
+                
         else:
             result["outputdir"]=['No Files']
         result["log"] = obj.log
@@ -207,7 +234,10 @@ def setJob(request):
         obj = form.save()
         return getJobDetail(request.user, obj.id)
     else:
-        return {'job': {'error':"Job could not be created", } }
+        message = {'job': {'error':{ } } }
+        for k, v in form.errors.iteritems():
+            message['job']['error'][k] = v[0]
+        return message
     
 
 def editJob(request):
@@ -221,7 +251,10 @@ def editJob(request):
         obj = form.save()
         return getJobDetail(request.user, obj.id)
     else:
-        return {'job': {'error':"Job could not be modified", } }
+        message = {'job': {'error':{ } } }
+        for k, v in form.errors.iteritems():
+            message['job']['error'][k] = v[0]
+        return message
 
 def deleteJob(request):
     try:
@@ -238,7 +271,10 @@ def setJoblist(request):
         obj = form.save()
         return getJoblistDetail(request.user, obj.id)
     else:
-        return {'joblist': {'error':"Joblist could not be created", } }
+        message = {'joblist': {'error':{ } } }
+        for k, v in form.errors.iteritems():
+            message['job']['error'][k] = v[0]
+        return message
 
 def editJoblist(request):
     try:
@@ -251,7 +287,10 @@ def editJoblist(request):
         obj = form.save()
         return getJoblistDetail(request.user, obj.id)
     else:
-        return {'joblist': {'error':"Joblist could not be modified", } }
+        message = {'joblist': {'error':{ } } }
+        for k, v in form.errors.iteritems():
+            message['job']['error'][k] = v[0]
+        return message
     
 def deleteJoblist(request):
     try:
@@ -268,9 +307,10 @@ def setTask(request):
         obj = form.save()
         return getTaskDetail(request.user, obj.id)
     else:
-        # [ item for item in form.errors.iteritems() ]
-        # [('schedule', [u'Merci de ne pas planifier pour hier'])]
-        return {'task': {'error':"Task could not be created", } }
+        message = {'task': {'error':{ } } }
+        for k, v in form.errors.iteritems():
+            message['job']['error'][k] = v[0]
+        return message
 
 def editTask(request):
     try:
@@ -283,7 +323,10 @@ def editTask(request):
         obj = form.save()
         return getTaskDetail(request.user, obj.id)
     else:
-        return {'joblist': {'error':"Joblist could not be modified", } }
+        message = {'task': {'error':{ } } }
+        for k, v in form.errors.iteritems():
+            message['job']['error'][k] = v[0]
+        return message
     
 
 def deleteTask(request):
@@ -293,4 +336,26 @@ def deleteTask(request):
         return {'task': {'error':"Task does not exist", } }
     obj.delete()
     return {'task': {'success':"Task deleted", } }
+
+
+def deleteFiles(request):
+    try:
+        obj = TaskHistory.objects.get(owner=request.user, id=request.POST['id'])
+    except:
+        return {'task': {'error':"TaskHistory does not exist", } }
+    try:
+        if obj.outputdir:
+            video_path = os.path.join(VIDEO_ROOT, obj.outputdir).replace('\\','/')
+            files = os.listdir(video_path)
+            if files:
+                for filename in files:
+                    os.remove(video_path+'/'+filename)
+                obj.outputdir = ''
+                obj.save()
+        else:
+            return {'task': {'error':"No files to delete", } }
+    except:
+        return {'task': {'error':"Files not deleted : an error has occured", } }
+    
+    return {'taskhistory': {'success':"TaskHistory files deleted", } }
 

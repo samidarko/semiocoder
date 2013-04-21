@@ -64,7 +64,7 @@ def api(request):
             
             fnPost = { "setjob":  setJob, "editjob": editJob, 'deletejob': deleteJob, 
                       "setjoblist":  setJoblist, 'editjoblist': editJoblist, 'deletejoblist': deleteJoblist,
-                      "settask" : setTask, 'edittask' : editTask, 'deletetask' : deleteTask, "login" : login, }
+                      "settask" : setTask, 'edittask' : editTask, 'deletetask' : deleteTask, "login" : login, "deletefiles" : deleteFiles }
         
             if action in fnPost:
                 try:
@@ -85,5 +85,4 @@ def api(request):
     else:
         return render_to_response('api/api_help.html', context_instance=RequestContext(request))
     
-    # A faire la partie set avec POST + appels vers les formulaire + save des objets
-    # Login et logout
+    # TODO: Login et logout depuis l'api ?

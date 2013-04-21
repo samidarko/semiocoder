@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -58,10 +56,41 @@
 <span class="sd">.. moduleauthor:: Samuel Darko &lt;samidarko@gmail.com&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">django</span> <span class="kn">import</span> <span class="n">forms</span>
+<span class="kn">from</span> <span class="nn">django.forms.widgets</span> <span class="kn">import</span> <span class="n">Textarea</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
 <span class="kn">from</span> <span class="nn">semiocoder.encoder.models</span> <span class="kn">import</span> <span class="n">Joblist</span><span class="p">,</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Task</span><span class="p">,</span> <span class="n">Encoder</span><span class="p">,</span> <span class="n">Extension</span>
 
+
+<span class="n">white_list</span><span class="o">=</span><span class="s">&#39;[^\w :=&quot;</span><span class="se">\&#39;</span><span class="s">-]+&#39;</span>
+<span class="n">options_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">white_list</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JobForm"><a class="viewcode-back" href="../../encoder/forms.html#encoder.forms.JobForm">[docs]</a><span class="k">class</span> <span class="nc">JobForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Classe formulaire de l&#39;objet Job</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Nom * &#39;</span><span class="p">)</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">Textarea</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span> <span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">encoder</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">Encoder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Encodeur * &#39;</span><span class="p">,)</span> <span class="c">#, empty_label=&quot;------&quot;)</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Options * &#39;</span><span class="p">,</span> <span class="n">widget</span><span class="o">=</span><span class="n">Textarea</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}))</span>
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">Extension</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Extension * &#39;</span><span class="p">)</span> <span class="c">#, empty_label=&quot;------&quot;)</span>
+
+    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
+        <span class="n">model</span> <span class="o">=</span> <span class="n">Job</span>
+        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;description&#39;</span><span class="p">,</span> <span class="s">&#39;encoder&#39;</span><span class="p">,</span> <span class="s">&#39;options&#39;</span><span class="p">,</span> <span class="s">&#39;extension&#39;</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">cleaned_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cleaned_data</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">cleaned_data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s">&quot;options&quot;</span><span class="p">)</span>
+        
+        <span class="k">if</span> <span class="n">options_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">[</span><span class="s">&quot;options&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">error_class</span><span class="p">([</span><span class="s">&quot;Des options ne sont pas autorisées, merci de contacter l&#39;administrateur !&quot;</span><span class="p">])</span>
+
+        <span class="c"># Always return the full collection of cleaned data.</span>
+        <span class="k">return</span> <span class="n">cleaned_data</span>
+        
+</div>
 <div class="viewcode-block" id="JoblistForm"><a class="viewcode-back" href="../../encoder/forms.html#encoder.forms.JoblistForm">[docs]</a><span class="k">class</span> <span class="nc">JoblistForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Classe formulaire de l&#39;objet Joblist</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -76,26 +105,13 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">JoblistForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Nom * &#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;job&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelMultipleChoiceField</span><span class="p">(</span><span class="n">Job</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">user</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Jobs * &#39;</span><span class="p">)</span> <span class="c"># On filtre le queryset par utilisateur</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">widget</span><span class="o">=</span><span class="n">Textarea</span><span class="p">(</span><span class="n">attrs</span><span class="o">=</span><span class="p">{</span><span class="s">&#39;rows&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}),</span> <span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
     
     <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">Joblist</span>
         <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;description&#39;</span><span class="p">,</span> <span class="s">&#39;job&#39;</span><span class="p">)</span>
-
-</div>
-<div class="viewcode-block" id="JobForm"><a class="viewcode-back" href="../../encoder/forms.html#encoder.forms.JobForm">[docs]</a><span class="k">class</span> <span class="nc">JobForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Classe formulaire de l&#39;objet Job</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="n">name</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Nom * &#39;</span><span class="p">)</span>
-    <span class="n">encoder</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">Encoder</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Encodeur * &#39;</span><span class="p">)</span> <span class="c">#, empty_label=&quot;------&quot;)</span>
-    <span class="n">options</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">CharField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Options * &#39;</span><span class="p">)</span>
-    <span class="n">extension</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">Extension</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">all</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Extension * &#39;</span><span class="p">)</span> <span class="c">#, empty_label=&quot;------&quot;)</span>
-
-    <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
-        <span class="n">model</span> <span class="o">=</span> <span class="n">Job</span>
-        <span class="n">fields</span> <span class="o">=</span> <span class="p">(</span><span class="s">&#39;name&#39;</span><span class="p">,</span> <span class="s">&#39;description&#39;</span><span class="p">,</span> <span class="s">&#39;encoder&#39;</span><span class="p">,</span> <span class="s">&#39;options&#39;</span><span class="p">,</span> <span class="s">&#39;extension&#39;</span><span class="p">,</span> <span class="p">)</span>
         
-</div>
+<span class="c"># TODO: filter les fichiers a uploader en fonction de leur extension</span></div>
 <div class="viewcode-block" id="TaskForm"><a class="viewcode-back" href="../../encoder/forms.html#encoder.forms.TaskForm">[docs]</a><span class="k">class</span> <span class="nc">TaskForm</span><span class="p">(</span><span class="n">forms</span><span class="o">.</span><span class="n">ModelForm</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Classe formulaire de l&#39;objet Task</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -110,7 +126,8 @@
         <span class="nb">super</span><span class="p">(</span><span class="n">TaskForm</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;joblist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">ModelChoiceField</span><span class="p">(</span><span class="n">Joblist</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">owner</span><span class="o">=</span><span class="n">user</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Joblists * &#39;</span><span class="p">)</span> <span class="c"># On filtre le queryset par utilisateur</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;schedule&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">DateTimeField</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">+</span><span class="n">timedelta</span><span class="p">(</span><span class="n">minutes</span><span class="o">=</span><span class="mi">10</span><span class="p">))</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s">&#39;</span><span class="si">%d</span><span class="s">/%m/%Y %H:%M&#39;</span><span class="p">),</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Planification * &#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;source_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Fichier source * &#39;</span><span class="p">,</span> <span class="n">help_text</span><span class="o">=</span><span class="s">&quot;(fichier à encoder)&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;source_file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">FileField</span><span class="p">(</span><span class="n">label</span><span class="o">=</span><span class="s">&#39;Fichier source * &#39;</span><span class="p">,)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fields</span><span class="p">[</span><span class="s">&#39;notify&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">forms</span><span class="o">.</span><span class="n">BooleanField</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&#39;Notification&#39;</span><span class="p">,</span><span class="n">help_text</span><span class="o">=</span><span class="s">&#39; - cocher pour activer&#39;</span><span class="p">)</span>
 
     <span class="k">class</span> <span class="nc">Meta</span><span class="p">:</span>
         <span class="n">model</span> <span class="o">=</span> <span class="n">Task</span>
@@ -164,7 +181,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2012, Samuel Darko.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>

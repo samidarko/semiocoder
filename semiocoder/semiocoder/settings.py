@@ -67,7 +67,7 @@ STATIC_ROOT = os.path.join(os.getcwd()).replace('\\','/')
 # Example: "http://media.lawrence.com/static/"
 STATIC_URL = '/static/'
 
-STATIC_DIR = os.path.join(os.getcwd(), __package__, 'static').replace('\\','/')
+STATIC_DIR = os.path.join('/home/samidarko/git/semiocoder/semiocoder/semiocoder', 'static').replace('\\','/')
 # Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".

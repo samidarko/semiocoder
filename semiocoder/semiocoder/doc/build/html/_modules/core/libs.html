@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -58,10 +56,13 @@
 <span class="sd">.. moduleauthor:: Samuel Darko &lt;samidarko@gmail.com&gt;</span>
 
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">feedparser</span>
+<span class="kn">import</span> <span class="nn">datetime</span><span class="o">,</span> <span class="nn">feedparser</span><span class="o">,</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">django.core.mail</span> <span class="kn">import</span> <span class="n">EmailMultiAlternatives</span>
-<span class="kn">from</span> <span class="nn">django.contrib.auth.models</span> <span class="kn">import</span> <span class="n">User</span>
-<span class="kn">from</span> <span class="nn">semiocoder.encoder.models</span> <span class="kn">import</span> <span class="n">TaskHistory</span>
+<span class="kn">from</span> <span class="nn">semiocoder.settings</span> <span class="kn">import</span> <span class="n">EMAIL_FILE_PATH</span><span class="p">,</span> <span class="n">SERVER_EMAIL</span>
+<span class="kn">from</span> <span class="nn">reportlab.lib.pagesizes</span> <span class="kn">import</span> <span class="n">A4</span>
+<span class="kn">from</span> <span class="nn">reportlab.lib.styles</span> <span class="kn">import</span> <span class="n">getSampleStyleSheet</span>
+<span class="kn">from</span> <span class="nn">reportlab.platypus</span> <span class="kn">import</span> <span class="n">SimpleDocTemplate</span><span class="p">,</span> <span class="n">Paragraph</span><span class="p">,</span> <span class="n">Spacer</span>
+
 
 <div class="viewcode-block" id="getAARFeed"><a class="viewcode-back" href="../../core/libs.html#core.libs.getAARFeed">[docs]</a><span class="k">def</span> <span class="nf">getAARFeed</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Renvoi les 6 dernières nouvelles des AAR via leur flux RSS</span>
@@ -78,22 +79,48 @@
     <span class="k">return</span> <span class="n">news</span>
 
 </div>
-<div class="viewcode-block" id="notify"><a class="viewcode-back" href="../../core/libs.html#core.libs.notify">[docs]</a><span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
+<span class="n">styles</span><span class="o">=</span><span class="n">getSampleStyleSheet</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">makeTaskLogToPdf</span><span class="p">(</span><span class="n">th</span><span class="p">):</span>
+    <span class="n">reportname</span> <span class="o">=</span> <span class="n">EMAIL_FILE_PATH</span><span class="o">+</span><span class="s">&#39;/&#39;</span><span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">joblist</span><span class="o">+</span><span class="s">&quot;.pdf&quot;</span>
+    <span class="n">doc</span> <span class="o">=</span> <span class="n">SimpleDocTemplate</span><span class="p">(</span><span class="n">reportname</span><span class="p">,</span><span class="n">pagesize</span><span class="o">=</span><span class="n">A4</span><span class="p">,</span> <span class="n">rightMargin</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">leftMargin</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span> <span class="n">topMargin</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span><span class="n">bottomMargin</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+    <span class="n">Story</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">Story</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Paragraph</span><span class="p">(</span><span class="s">&#39;Log de la joblist &#39;</span><span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">joblist</span><span class="p">,</span> <span class="n">styles</span><span class="p">[</span><span class="s">&quot;Title&quot;</span><span class="p">]))</span>
+    <span class="n">Story</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Spacer</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">12</span><span class="p">))</span>
+
+    <span class="n">logtab</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">logtab</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&#39;=====&#39;</span><span class="p">):</span>
+            <span class="n">Story</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Paragraph</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">styles</span><span class="p">[</span><span class="s">&quot;Heading3&quot;</span><span class="p">]))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">Story</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Paragraph</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">styles</span><span class="p">[</span><span class="s">&quot;Normal&quot;</span><span class="p">]))</span>
+
+    <span class="n">doc</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">Story</span><span class="p">)</span>
+    
+    <span class="n">report</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">reportname</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">report</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">report</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">reportname</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">content</span>
+
+
+<div class="viewcode-block" id="notify"><a class="viewcode-back" href="../../core/libs.html#core.libs.notify">[docs]</a><span class="k">def</span> <span class="nf">notify</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">th</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Fonction de notification de l&#39;utilisateur (A revoir)</span>
 <span class="sd">    </span>
 <span class="sd">    :returns: None</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">semiocoder</span> <span class="o">=</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">email</span>
-    <span class="n">th</span> <span class="o">=</span> <span class="n">TaskHistory</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pk</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
-    <span class="n">addressee</span> <span class="o">=</span> <span class="p">[</span> <span class="n">User</span><span class="o">.</span><span class="n">objects</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">username__exact</span><span class="o">=</span><span class="n">th</span><span class="o">.</span><span class="n">owner</span><span class="p">)</span><span class="o">.</span><span class="n">email</span> <span class="p">]</span>
 
     <span class="n">subject</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="s">&#39;La tache &#39;</span><span class="o">+</span> <span class="n">th</span><span class="o">.</span><span class="n">joblist</span> <span class="o">+</span> <span class="s">&#39; s est termine avec le statut &#39;</span> <span class="o">+</span><span class="n">th</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
-    <span class="n">from_email</span><span class="p">,</span> <span class="n">to</span> <span class="o">=</span> <span class="n">semiocoder</span><span class="p">,</span> <span class="n">addressee</span>
+    <span class="n">from_email</span><span class="p">,</span> <span class="n">to</span> <span class="o">=</span> <span class="n">SERVER_EMAIL</span><span class="p">,</span> <span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">owner</span><span class="o">.</span><span class="n">email</span><span class="p">,)</span>
     <span class="n">text_content</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">log</span>
     <span class="n">html_content</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">log</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\n</span><span class="s">&lt;br&gt;&quot;</span><span class="p">)</span>
     <span class="n">msg</span> <span class="o">=</span> <span class="n">EmailMultiAlternatives</span><span class="p">(</span><span class="n">subject</span><span class="p">,</span> <span class="n">text_content</span><span class="p">,</span> <span class="n">from_email</span><span class="p">,</span> <span class="n">to</span><span class="p">)</span>
     <span class="n">msg</span><span class="o">.</span><span class="n">attach_alternative</span><span class="p">(</span><span class="n">html_content</span><span class="p">,</span> <span class="s">&quot;text/html&quot;</span><span class="p">)</span>
-    <span class="c">#msg.attach_file(&#39;report.pdf&#39;, &#39;application/pdf&#39;)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">makeTaskLogToPdf</span><span class="p">(</span><span class="n">th</span><span class="p">)</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="s">&#39;report.pdf&#39;</span><span class="p">,</span> <span class="n">content</span><span class="p">,</span> <span class="s">&#39;application/pdf&#39;</span><span class="p">)</span>
     <span class="n">msg</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
 </pre></div></div>
 
@@ -134,7 +161,7 @@
     </div>
     <div class="footer">
         &copy; Copyright 2012, Samuel Darko.
-      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2b1.
     </div>
   </body>
 </html>
